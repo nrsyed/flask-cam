@@ -4,4 +4,13 @@
   </head>
   <body>
     <img src="{{ url_for('stream') }}">
+    <br>
+    <h2>Controls</h2>
+    <form id="controls">
+      Focus: <input id="slider-focus" type="range" min=0 max=250 step=5>
+      <br>
+      <input id="submit" type="submit" value="Set">
+    </form>
+  </body>
+  <script src="{{ url_for('static', filename='scripts.js') }}"></script>
 </html>
