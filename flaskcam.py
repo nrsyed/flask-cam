@@ -5,6 +5,7 @@ from camera import Camera
 
 app = Flask(__name__)
 cam = Camera()
+delay = 0.3
 
 @app.route("/")
 def index():
@@ -18,9 +19,13 @@ def stream():
 
 @app.route("/submit", methods=["POST"])
 def submit():
+    global delay
     focus = int(request.form["slider-focus"])
+    zoom = int(request.form["slider-zoom"])
+    delay = float(request.form["num-delay"])
     cam.set_focus(focus)
-    return "success"
+    cam.set_zoom(zoom)
+    return "ok"
 
 def gen():
     #cam = Camera()
@@ -29,7 +34,7 @@ def gen():
         yield (b'--frame-boundary\r\nContent-Type: image/jpeg\r\n\r\n'
                 + bytearray(frame) + b'\r\n'
         )
-        time.sleep(.3)
+        time.sleep(delay)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0")

@@ -33,5 +33,10 @@ class Camera():
             ["uvcdynctrl", "-d", "video0", "-s", "Focus (absolute)", str(focus)]
         )
 
+    def set_zoom(self, zoom):
+        subprocess.call(
+            ["uvcdynctrl", "-d", "video0", "-s", "Zoom, Absolute", str(zoom)]
+        )
+
     def __del__(self):
         self.cap.release()
