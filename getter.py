@@ -57,7 +57,6 @@ def main():
         if stream.stopped:
             break
         ip_addr, port = listener.accept().recv()
-        #print("{}:{}".format(ip_addr, port))
         sender = multiprocessing.connection.Client((ip_addr, port))
         sender.send(stream.frame)
     listener.close()

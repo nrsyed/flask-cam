@@ -46,13 +46,28 @@ def set_focus(focus):
     )
 
 def gen():
-        #delay = current_app.delay
-    #frame_getter = FrameGet().start()
+    with app.app_context():
+        send_to = current_app.send_to
 
     while True:
-        frame = get_from_server()
+        # Find free socket (port) to listen on.
+        sock = socket.socket()
+        sock.bind(("",0))
+        recv_port = sock.getsockname()[1]
+        sock.close()
+        listen_on = ("localhost", recv_port)
+        listener = multiprocessing.connection.Listener(listen_on)
+
+        # With our request, send the address we're listening on.
+        sender = multiprocessing.connection.Client(send_to)
+        sender.send(listen_on)
+
+        # The cam server will send a frame in response.
+        frame = listener.accept().recv()
+        frame_jpg = cv2.imencode(".jpg", frame)[1]
+
         yield (b'--frame-boundary\r\nContent-Type: image/jpeg\r\n\r\n'
-                + bytearray(frame) + b'\r\n'
+                + bytearray(frame_jpg) + b'\r\n'
         )
 
 def get_from_server():
@@ -65,7 +80,6 @@ def get_from_server():
     recv_port = sock.getsockname()[1]
     sock.close()
     listen_on = ("localhost", recv_port)
-    frames = open("stream.jpg", "wb+")
     listener = multiprocessing.connection.Listener(listen_on)
 
     # With our request, send the address we're listening on.
@@ -74,8 +88,9 @@ def get_from_server():
 
     # The cam server will send a frame in response.
     frame = listener.accept().recv()
-    cv2.imwrite("stream.jpg", frame)
-    return frames.read()
+
+    frame_jpg = cv2.imencode(".jpg", frame)[1]
+    return frame_jpg
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", threaded=True)
