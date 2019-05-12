@@ -12,7 +12,6 @@ class Camera():
         #self.cap.set(14, 0)
 
     def get_frame(self):
-        self.frames = open("stream.jpg", "wb+")
         grabbed, frame = self.cap.read()
 
         if not grabbed:
@@ -25,8 +24,8 @@ class Camera():
             frame, timestamp, (int(0.02 * width), int(0.98 * height)),
             cv2.FONT_HERSHEY_COMPLEX_SMALL, .7, (250, 250, 250), 1, 20, False
         )
-        cv2.imwrite("stream.jpg", frame)
-        return self.frames.read()
+        frame_jpg = cv2.imencode(".jpg", frame)[1]
+        return frame_jpg
 
     def set_focus(self, focus):
         subprocess.call(
