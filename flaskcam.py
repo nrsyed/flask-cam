@@ -1,4 +1,3 @@
-from functools import wraps
 import time
 
 from flask import Flask, render_template, Response, request
@@ -11,24 +10,22 @@ delay = 0.3
 def check_auth(username, password):
     return username == "dexter" and password == "omelet"
 
-def authenticate():
+def unauthorized():
     return Response(
         "Credential error", 401, {"WWW-Authenticate": "Basic realm='Login Required'"}
     )
 
-def requires_auth(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
+def requires_auth(func):
+    def wrapper(*args, **kwargs):
         auth = request.authorization
         if not auth or not check_auth(auth.username, auth.password):
-            return authenticate()
-        return f(*args, **kwargs)
-    return decorated
+            return unauthorized()
+        return func(*args, **kwargs)
+    return wrapper 
 
 @app.route("/")
 @requires_auth
 def index():
-    #return "<h1>$uccess*</h1>"
     return render_template("index.html")
 
 @app.route("/stream")
