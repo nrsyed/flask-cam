@@ -1,3 +1,4 @@
+import functools
 import time
 
 from flask import Flask, render_template, Response, request
@@ -16,6 +17,7 @@ def unauthorized():
     )
 
 def requires_auth(func):
+    @functools.wraps(func)
     def wrapper(*args, **kwargs):
         auth = request.authorization
         if not auth or not check_auth(auth.username, auth.password):
@@ -44,7 +46,6 @@ def submit():
     return "ok"
 
 def gen():
-    #cam = Camera()
     while True:
         frame = cam.get_frame()
         yield (b'--frame-boundary\r\nContent-Type: image/jpeg\r\n\r\n'
