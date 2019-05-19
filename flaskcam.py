@@ -41,8 +41,9 @@ def submit():
     focus = int(request.form["slider-focus"])
     zoom = int(request.form["slider-zoom"])
     delay = float(request.form["num-delay"])
-    cam.set_focus(focus)
-    cam.set_zoom(zoom)
+
+    cam.set_control_value("focus", focus)
+    cam.set_control_value("zoom", zoom)
     return "ok"
 
 def gen():
