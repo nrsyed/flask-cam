@@ -2,14 +2,13 @@ import functools
 import time
 
 from flask import Flask, render_template, Response, request
+
 from camera import Camera
+from password import authenticate_user
 
 app = Flask(__name__)
 cam = Camera()
 delay = 0.3
-
-def check_auth(username, password):
-    return username == "dexter" and password == "omelet"
 
 def unauthorized():
     return Response(
@@ -20,7 +19,7 @@ def requires_auth(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         auth = request.authorization
-        if not auth or not check_auth(auth.username, auth.password):
+        if not auth or not authenticate_user(auth.username, auth.password, "users"):
             return unauthorized()
         return func(*args, **kwargs)
     return wrapper 

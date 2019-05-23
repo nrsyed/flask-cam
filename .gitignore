@@ -40,7 +40,6 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
-
 # Flask stuff
 instance/
 .webassets-cache
