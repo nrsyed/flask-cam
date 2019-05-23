@@ -5,6 +5,11 @@ import sys
 
 import bcrypt
 
+def get_base64_hash(password):
+    hashed = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+    hashed64 = base64.b64encode(hashed).decode("utf-8")
+    return hashed64
+
 def add_user(user, password, filepath):
     user_in_file = False
     if os.path.isfile(filepath):
@@ -15,8 +20,7 @@ def add_user(user, password, filepath):
                     user_in_file = True
 
     if not user_in_file:
-        hashed = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
-        hashed64 = base64.b64encode(hashed).decode("utf-8")
+        hashed64 = get_base64_hash(password)
         with open(filepath, "a") as file_:
             file_.write("{}\t{}\n".format(user, hashed64))
         return True
@@ -36,10 +40,37 @@ def authenticate_user(user, password, filepath):
     return False
 
 def delete_user(user, filepath):
+    user_removed = False
     if os.path.isfile(filepath):
         with open(filepath, "r") as file_:
             lines = file_.readlines()
-        print(lines)
+
+        with open(filepath, "w") as file_:
+            for line in lines:
+                user_, hashed64 = line.strip().split("\t")
+                if user_ != user:
+                    file_.write("{}\t{}\n".format(user_, hashed64))
+                else:
+                    user_removed = True
+            file_.truncate()
+    return user_removed
+
+def modify_user(user, password, filepath):
+    user_modified = False
+    if os.path.isfile(filepath):
+        with open(filepath, "r") as file_:
+            lines = file_.readlines()
+
+        with open(filepath, "w") as file_:
+            for line in lines:
+                user_, hashed64 = line.strip().split("\t")
+                if user_ == user:
+                    new_hashed64 = get_base64_hash(password)
+                    file_.write("{}\t{}\n".format(user, new_hashed64))
+                    user_modified = True
+                else:
+                    file_.write(line)
+    return user_modified
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
@@ -58,10 +89,10 @@ if __name__ == "__main__":
 
     if args["add_user"]:
         add_user(args["user"], args["password"], args["filepath"])
-    #elif args["delete_user"]:
-    #    delete_user(args["user"], args["filepath"])
-    #elif args["modify_user"]:
-    #    modify_user(args["user"], args["password"], args["filepath"])
+    elif args["delete_user"]:
+        delete_user(args["user"], args["filepath"])
+    elif args["modify_user"]:
+        modify_user(args["user"], args["password"], args["filepath"])
     elif args["check_password"]:
         val = authenticate_user(args["user"], args["password"], args["filepath"])
         print(val)
