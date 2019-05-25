@@ -1,4 +1,5 @@
 import functools
+from ipaddress import ip_address, ip_network
 import syslog
 import time
 
@@ -22,15 +23,21 @@ def unauthorized():
 def requires_auth(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        auth = request.authorization
-        if not auth or not authenticate_user(auth.username, auth.password, "users"):
-            return unauthorized()
+        # Get IP address of requester using nginx header. Do not require
+        # authentication for requests originating on the local network.
+        remote_addr = request.environ.get("HTTP_X_FORWARDED_FOR")
+        if ip_address(remote_addr) not in ip_network("192.168.1.0/24"):
+            auth = request.authorization
+            if not auth or not authenticate_user(auth.username, auth.password, "users"):
+                return unauthorized()
         return func(*args, **kwargs)
     return wrapper 
 
 @app.route("/")
 @requires_auth
 def index():
+    remote_addr = request.environ.get("HTTP_X_FORWARDED_FOR")
+    syslog.syslog("request from {}".format(remote_addr))
     return render_template("index.html")
 
 @app.route("/stream")
