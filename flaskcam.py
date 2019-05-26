@@ -13,7 +13,7 @@ cam = Camera()
 
 @app.before_first_request
 def initialize():
-    current_app.delay = 0.2
+    current_app.delay = 0.1
 
 def unauthorized():
     return Response(
@@ -26,7 +26,9 @@ def requires_auth(func):
         # Get IP address of requester using nginx header. Do not require
         # authentication for requests originating on the local network.
         remote_addr = request.environ.get("HTTP_X_FORWARDED_FOR")
-        if ip_address(remote_addr) not in ip_network("192.168.1.0/24"):
+        if (remote_addr is None
+            or ip_address(remote_addr) not in ip_network("192.168.1.0/24")
+        ):
             auth = request.authorization
             if not auth or not authenticate_user(auth.username, auth.password, "users"):
                 return unauthorized()
@@ -47,10 +49,16 @@ def stream():
 
 @app.route("/submit", methods=["POST"])
 def submit():
+    brightness = int(request.form["slider-brightness"])
+    contrast = int(request.form["slider-contrast"])
+    exposure = int(request.form["slider-exposure"])
     focus = int(request.form["slider-focus"])
     zoom = int(request.form["slider-zoom"])
     current_app.delay = float(request.form["num-delay"])
 
+    cam.set_control_value("brightness", brightness)
+    cam.set_control_value("contrast", contrast)
+    cam.set_control_value("exposure", exposure)
     cam.set_control_value("focus", focus)
     cam.set_control_value("zoom", zoom)
     return "ok"
