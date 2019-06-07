@@ -26,14 +26,6 @@ cd flask-cam
 pip install -r requirements.txt
 ```
 
-Assuming you're running
-<a href="https://wiki.archlinux.org/index.php/Uncomplicated_Firewall">ufw</a>,
-allow connections on the port you'd like the server to use, e.g., port 5000.
-
-```
-sudo ufw allow 5000
-```
-
 Ensure your Python virtual environment is activated (if using one), *then* run
 `make_systemd_file.sh` to create a systemd unit file that will allow Gunicorn
 to serve the application as a service, which will be named `flaskcam`. Next,
@@ -45,3 +37,46 @@ sudo systemctl start flaskcam
 sudo systemctl enable flaskcam
 ```
 
+To configure Nginx to properly route requests to gunicorn, create the file
+`/etc/nginx/sites-available/flaskcam` and fill it out as follows, replacing the
+port `9001` with the port you'd like your server to use, the sample IP address
+`192.168.1.101` with the IP address of your Raspberry Pi on your local network
+(which can be found with the `ifconfig` command), and the path to the flask-cam
+repository directory (`/home/pi/flask-cam/`) with your own, if you've placed it
+in a different directory. Note that standard HTTP port is 80, but it may be
+prudent to choose a different port for obscurity.
+
+```
+server {
+    listen 9001;
+    server_name 192.168.1.101
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/home/pi/flask-cam/flaskcam.sock;
+    }
+}
+```
+
+Enable this configuration by symlinking it in the Nginx `sites-enabled` directory.
+
+```
+sudo ln -s /etc/nginx/sites-available/flaskcam /etc/nginx/sites-enabled
+```
+
+Test the configuration file you just created by running `nginx` with the `-t`
+flag. If this indicates no errors, restart the Nginx service to effect the
+changes.
+
+```
+sudo nginx -t
+sudo systemctl restart nginx
+```
+
+Assuming you're running
+<a href="https://wiki.archlinux.org/index.php/Uncomplicated_Firewall">ufw</a>,
+allow connections on the port you chose above.
+
+```
+sudo ufw allow 9001
+```
