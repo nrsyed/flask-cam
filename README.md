@@ -1,4 +1,4 @@
-# Flask internet streaming webcam server
+# Raspberry Pi internet streaming webcam server
 
 ## Installation and setup
 
@@ -26,4 +26,22 @@ cd flask-cam
 pip install -r requirements.txt
 ```
 
+Assuming you're running
+<a href="https://wiki.archlinux.org/index.php/Uncomplicated_Firewall">ufw</a>,
+allow connections on the port you'd like the server to use, e.g., port 5000.
+
+```
+sudo ufw allow 5000
+```
+
+Ensure your Python virtual environment is activated (if using one), *then* run
+`make_systemd_file.sh` to create a systemd unit file that will allow Gunicorn
+to serve the application as a service, which will be named `flaskcam`. Next,
+start and enable said service.
+
+```
+./make_systemd_file.sh
+sudo systemctl start flaskcam
+sudo systemctl enable flaskcam
+```
 
