@@ -56,5 +56,6 @@ ENV/
 env.bak/
 venv.bak/
 
-# User/password file
+# Credentials files
+secrets
 users
