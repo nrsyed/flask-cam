@@ -43,7 +43,7 @@ port `9001` with the port you'd like your server to use, the sample IP address
 `192.168.1.101` with the IP address of your Raspberry Pi on your local network
 (which can be found with the `ifconfig` command), and the path to the flask-cam
 repository directory (`/home/pi/flask-cam/`) with your own, if you've placed it
-in a different directory. Note that standard HTTP port is 80, but it may be
+in a different directory. Note that the standard HTTP port is 80, but it may be
 prudent to choose a different port for obscurity.
 
 ```
@@ -80,3 +80,50 @@ allow connections on the port you chose above.
 ```
 sudo ufw allow 9001
 ```
+
+The Flask application requires username/password authentication to access the
+index page. Passwords are encrypted and authenticated via `bcrypt`. To add a
+user, run `password.py` with the `-a`/`--add-user` flag, specifying the
+username with the `-u`/`--user` option and the password with the
+`-p`/`--password` option. Replace `dexter` with your desired username and
+`omelet` with your desired password.
+
+```
+python password.py --add-user --user dexter --password omelet
+```
+
+By default, this creates a file named `users` in the application directory,
+which contains the username and the base-64 encoded hash of the password.
+Multiple users can be added by the same process. To modify an existing user's
+password or or delete a user from the list, use `-m`/`--modify-user` and
+`-d`/`--delete-user` flags, respectively.
+
+```
+# Modify a user's password.
+python password.py --modify-user --user dexter --password hunter2
+
+# Delete a user.
+python password.py --delete-user dexter
+```
+
+To check a user's password, use the `-c`/`--check-password` flag, which prints
+`True` if the password given is correct and `False` otherwise.
+
+The final step is modifying your router's port forwarding settings (assuming
+you're accessing the internet from behind a router) to forward the port
+previously selected (9001 in the example above) to your Raspberry Pi's local
+IP address, which, again, can be obtained via `ifconfig`.
+
+To access the app, use your public IP address and the port you chose above.
+You can obtain your public IP address using the `dig` tool, which is part of
+the `dnsutils` package.
+
+```
+sudo apt install dnsutils
+dig +short myip.opendns.com @resolver1.opendns.com
+999.9.999.999
+```
+
+Then, to access the index page of the app, simply navigate to
+`999.9.999.999:9001` in a web browser, replacing `999.9.999.999` with the IP
+address returned by `dig` and `9001` with the port you chose previously.
