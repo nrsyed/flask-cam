@@ -1,4 +1,7 @@
-# Raspberry Pi internet streaming webcam server
+# Raspberry Pi internet streaming Flask webcam server
+
+## Overview
+&pound; TODO
 
 ## Installation and setup
 
@@ -9,7 +12,7 @@ omitted and `camera.py` must be modified based on the specifics of your
 particular webcam(s).
 
 ```
-sudo apt -y install libffi-dev nginx uvcdynctrl
+sudo apt -y install dnsutils libffi-dev nginx uvcdynctrl
 ```
 
 Clone this repository, then install the necessary Python packages, preferably
@@ -95,8 +98,25 @@ Additional users can be added by the same process. For more information on
 working with the list of allowed users, refer to the section on
 <a href="#user-authentication">user authentication</a> below.
 
+The final step is modifying your router's port forwarding settings (assuming
+you're accessing the internet from behind a router) to forward the port
+previously selected (9001 in the example above) to your Raspberry Pi's local
+IP address, which, again, can be obtained via `ifconfig`.
 
-# User authentication
+To access the app, use your public IP address and the port you chose above.
+You can obtain your public IP address using the `dig` tool, which is part of
+the `dnsutils` package.
+
+```
+dig +short myip.opendns.com @resolver1.opendns.com
+999.9.999.999
+```
+
+Then, to access the index page of the app, simply navigate to
+`999.9.999.999:9001` in a web browser, replacing `999.9.999.999` with the IP
+address returned by `dig` and `9001` with the port you chose previously.
+
+## User authentication
 
 To modify an existing user's password or to delete a user from the list, use
 the `-m`/`--modify-user` and `-d`/`--delete-user` flags, respectively.
@@ -112,21 +132,3 @@ python password.py --delete-user dexter
 To check a user's password, use the `-c`/`--check-password` flag, which prints
 `True` if the password given is correct and `False` otherwise.
 
-The final step is modifying your router's port forwarding settings (assuming
-you're accessing the internet from behind a router) to forward the port
-previously selected (9001 in the example above) to your Raspberry Pi's local
-IP address, which, again, can be obtained via `ifconfig`.
-
-To access the app, use your public IP address and the port you chose above.
-You can obtain your public IP address using the `dig` tool, which is part of
-the `dnsutils` package.
-
-```
-sudo apt install dnsutils
-dig +short myip.opendns.com @resolver1.opendns.com
-999.9.999.999
-```
-
-Then, to access the index page of the app, simply navigate to
-`999.9.999.999:9001` in a web browser, replacing `999.9.999.999` with the IP
-address returned by `dig` and `9001` with the port you chose previously.
