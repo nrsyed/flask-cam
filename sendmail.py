@@ -33,7 +33,7 @@ def send_mail(
     except Exception as e:
         print(e)
     else:
-        print("success")
+        print("Email sent successfully")
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
