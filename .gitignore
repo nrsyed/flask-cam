@@ -59,3 +59,6 @@ venv.bak/
 # Credentials files
 secrets
 users
+
+# Application tmp files/directories
+tmp/
