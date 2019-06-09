@@ -1,7 +1,7 @@
 # Raspberry Pi internet streaming Flask webcam server
 
 ## Overview
-&pound; TODO
+&#35; TODO
 
 ## Installation and setup
 
@@ -132,3 +132,13 @@ python password.py --delete-user dexter
 To check a user's password, use the `-c`/`--check-password` flag, which prints
 `True` if the password given is correct and `False` otherwise.
 
+## Email alerts
+
+There are a number of ways to send email alerts initiated by events on the
+Raspberry Pi. Because it's relatively easy and doesn't require storing or
+using the credentials for my primary Gmail account, I've opted to use Amazon
+AWS SES (*S*imple *E*mail *S*ervice).
+
+&#35; TODO
+
+<img src="doc/img/aws_ses.png">
