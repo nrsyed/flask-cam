@@ -27,3 +27,7 @@ ExecStart=$PYTHON_DIR/gunicorn --timeout $TIMEOUT --workers 1 --threads $THREADS
 
 [Install]
 WantedBy=multi-user.target" | sudo tee /etc/systemd/system/flaskcam.service > /dev/null
+
+# Start and enable the service.
+sudo systemctl start flaskcam
+sudo systemctl enable flaskcam
