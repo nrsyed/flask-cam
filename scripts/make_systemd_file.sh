@@ -11,14 +11,15 @@ PYTHON_DIR=$(dirname "$(which python)")
 
 THREADS=5
 TIMEOUT=30
-USER_=$USER
 
+# Add a systemd unit file in /etc/systemd/system to start a gunicorn instance
+# to run the app.
 echo "[Unit]
 Description=Gunicorn daemon for flaskcam
 After=network.target
 
 [Service]
-User=$USER_
+User=$USER
 Group=www-data
 WorkingDirectory=$APP_DIR
 Environment=\"PATH=$PYTHON_DIR\"

@@ -12,7 +12,7 @@ APP_TMP_DIR="$APP_DIR/tmp"
 # Path to file containing previous IP address in flask-cam/tmp.
 FILEPATH="$APP_TMP_DIR/ipaddress"
 
-# Get current IP address.
+# Get current public/external IP address.
 IP_ADDR=$(dig +short myip.opendns.com @resolver1.opendns.com)
 
 # Create flask-cam/tmp if doesn't exist.
