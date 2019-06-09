@@ -94,5 +94,4 @@ if __name__ == "__main__":
     elif args["modify_user"]:
         modify_user(args["user"], args["password"], args["filepath"])
     elif args["check_password"]:
-        val = authenticate_user(args["user"], args["password"], args["filepath"])
-        print(val)
+        print(authenticate_user(args["user"], args["password"], args["filepath"]))
