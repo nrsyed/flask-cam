@@ -38,9 +38,11 @@ def send_mail(
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
     argparser.add_argument("-b", "--body", type=str, default="")
+    argparser.add_argument(
+        "-f", "--filepath", default="secrets", help="Path to secrets file"
+    )
     argparser.add_argument("-s", "--subject", type=str, default="")
-
     args = argparser.parse_args()
-    secrets = import_secrets("secrets")
 
+    secrets = import_secrets(args.filepath)
     send_mail(body=args.body, subject=args.subject, **secrets)
