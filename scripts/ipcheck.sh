@@ -23,4 +23,6 @@ IP_ADDR=$(dig +short myip.opendns.com @resolver1.opendns.com)
 if [ ! -f "$FILEPATH" ] || [ "$IP_ADDR" != "$(cat "$FILEPATH")" ]; then
   echo "IP changed"
   echo $IP_ADDR > "$FILEPATH"
+  cd "$APP_DIR"
+  python sendmail.py -s "IP change" -b "$IP_ADDR"
 fi
