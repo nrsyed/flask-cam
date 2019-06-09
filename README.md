@@ -27,14 +27,11 @@ pip install -r requirements.txt
 ```
 
 Ensure your Python virtual environment is activated (if using one), *then* run
-`make_systemd_file.sh` to create a systemd unit file that will allow Gunicorn
-to serve the application as a service, which will be named `flaskcam`. Next,
-start and enable said service.
+`make_systemd_file.sh` in the `scripts` directory to create a systemd unit file
+that will allow Gunicorn to serve the application as a service, named `flaskcam`.
 
 ```
-./make_systemd_file.sh
-sudo systemctl start flaskcam
-sudo systemctl enable flaskcam
+scripts/make_systemd_file.sh
 ```
 
 To configure Nginx to properly route requests to gunicorn, create the file
@@ -94,9 +91,15 @@ python password.py --add-user --user dexter --password omelet
 
 By default, this creates a file named `users` in the application directory,
 which contains the username and the base-64 encoded hash of the password.
-Multiple users can be added by the same process. To modify an existing user's
-password or or delete a user from the list, use `-m`/`--modify-user` and
-`-d`/`--delete-user` flags, respectively.
+Additional users can be added by the same process. For more information on
+working with the list of allowed users, refer to the section on
+<a href="#user-authentication">user authentication</a> below.
+
+
+# User authentication
+
+To modify an existing user's password or to delete a user from the list, use
+the `-m`/`--modify-user` and `-d`/`--delete-user` flags, respectively.
 
 ```
 # Modify a user's password.
