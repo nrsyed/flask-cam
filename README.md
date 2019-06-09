@@ -137,7 +137,7 @@ To check a user's password, use the `-c`/`--check-password` flag, which prints
 There are a number of ways to send email alerts initiated by events on the
 Raspberry Pi. Because it's relatively easy and doesn't require storing or
 using the credentials for my primary Gmail account, I've opted to use Amazon
-AWS SES (*S*imple *E*mail *S*ervice).
+AWS SES (**S**imple **E**mail **S**ervice).
 
 &#35; TODO
 
