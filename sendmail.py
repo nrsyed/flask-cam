@@ -6,6 +6,20 @@ import json
 import smtplib
 
 def import_secrets(filename):
+    """
+    Import a secrets file containing JSON in the following form:
+
+    {
+      "sender": "your_email_address@gmail.com",
+      "sender_name": "Raspberry Pi",
+      "recipient": "your_email_address@gmail.com",
+      "smtp_username": "ABCDEFGHIJKLMNOPQRST",
+      "smtp_password": "ABCD1eXw0/V/abcDEFg709fhJFKLAleabc",
+      "host": "email-smtp.us-west-2.amazonaws.com",
+      "port": 587
+    }
+    """
+
     with open(filename, "r") as file_:
         secrets = json.load(file_)
     return secrets
