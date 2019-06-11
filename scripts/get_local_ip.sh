@@ -1,17 +1,35 @@
 #!/bin/bash
 
+usage() {
+  SELF="${0##*/}"
+  echo -e "USAGE
+  $SELF [--addr] [--mask] [--help]
+
+  Return the local (internal) IP address followed by the subnet mask.
+
+  -a, --addr\t\treturn only the local IP address
+  -m, --mask\t\treturn only the subnet mask
+  -h, --help\t\tprint this message and exit"
+
+  exit 1
+}
+
 # Determine whether to print only IP, only subnet mask, or both based on
 # argument (or lack thereof).
 PRINT_IP=true
 PRINT_MASK=true
 
-if [ $# > 0 ]; then
+if (( $# > 0 )); then
   case "$1" in
     -a|--addr)
       PRINT_MASK=false
       ;;
     -m|--mask)
       PRINT_IP=false
+      ;;
+    -h|--help|*)
+      usage
+      ;;
   esac
 fi
 
@@ -37,3 +55,5 @@ if $PRINT_MASK; then
   MASK=$(egrep -o "$MASK_REGEX" <<< "$MATCHING_LINE" | egrep -o '[0-9]+.*[0-9]+')
   echo $MASK
 fi
+
+exit 0
