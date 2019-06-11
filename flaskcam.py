@@ -1,5 +1,8 @@
 import functools
 from ipaddress import ip_address, ip_network
+import os
+import subprocess
+import sys
 import syslog
 import time
 
@@ -25,10 +28,13 @@ def requires_auth(func):
     def wrapper(*args, **kwargs):
         # Get IP address of requester using nginx header. Do not require
         # authentication for requests originating on the local network.
+        ip_script_path = os.path.join(sys.path[0], "scripts/get_local_ip.sh")
+        script_output = subprocess.check_output(ip_script_path)
+        ip_addr, subnet_mask = script_output.decode("utf-8").strip().split()
+        subnet = ip_network("{}/{}".format(ip_addr, subnet_mask), strict=False)
+
         remote_addr = request.environ.get("HTTP_X_FORWARDED_FOR")
-        if (remote_addr is None
-            or ip_address(remote_addr) not in ip_network("192.168.1.0/24")
-        ):
+        if remote_addr is None or ip_address(remote_addr) not in subnet:
             auth = request.authorization
             if not auth or not authenticate_user(auth.username, auth.password, "users"):
                 return unauthorized()
