@@ -14,8 +14,10 @@ APP_TMP_DIR=$(readlink -f "$SCRIPTS_DIR/../tmp")
 # wireless interface to actually connect and receive an IP address.
 echo -e "#!/bin/bash
 sleep 40s
-echo \$($SCRIPTS_DIR/get_local_ip.sh) > $APP_TMP_DIR/local_network" | \
+echo \$($SCRIPTS_DIR/get_local_ip.sh) > $APP_TMP_DIR/local_network && chown $USER:$USER $APP_TMP_DIR/local_network" | \
   sudo tee /etc/network/if-up.d/get_local_ip > /dev/null \
   && sudo chmod +x /etc/network/if-up.d/get_local_ip
 
-# TODO: Add cron job to run same script as above at regular intervals.
+# Add cron job to run same script as above every 10 minutes.
+echo -e "*/10 * * * * $USER $SCRIPTS_DIR/get_local_ip.sh > $APP_TMP_DIR/local_network 2>&1" | \
+  sudo tee /etc/cron.d/get_local_ip > /dev/null
