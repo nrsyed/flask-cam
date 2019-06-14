@@ -44,7 +44,7 @@ fi
 
 IP_REGEX='inet [a-zA-Z\:]*(192\.168|10\.[0-9]+|172\.1[6789]|172\.2[0-9]|172\.3[01])\.[0-9]+\.[0-9]+'
 MASK_REGEX='mask[ \:]*[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+'
-MATCHING_LINE=$(ifconfig | egrep "$IP_REGEX")
+MATCHING_LINE=$(/sbin/ifconfig | egrep "$IP_REGEX")
 
 if $PRINT_IP; then
   IP_ADDR=$(egrep -o "$IP_REGEX" <<< "$MATCHING_LINE" | egrep -o '[0-9]+.*[0-9]+')
