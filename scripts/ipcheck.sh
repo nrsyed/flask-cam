@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# This script determines and records the system's external IP address (i.e.,
+# the IP address the system uses when it communicates with the outside world).
+# If the IP address has changed since the last run, an email alert is sent
+# via sendmail.py.
+
 # Where this script lives, i.e., the /scripts directory.
 SCRIPTS_DIR=$(readlink -f $(dirname "$0"))
 
@@ -10,7 +15,7 @@ APP_DIR=$(readlink -f "$SCRIPTS_DIR/..")
 APP_TMP_DIR="$APP_DIR/tmp"
 
 # Path to file containing previous IP address in flask-cam/tmp.
-FILEPATH="$APP_TMP_DIR/ipaddress"
+FILEPATH="$APP_TMP_DIR/external_ip"
 
 # Get current public/external IP address.
 IP_ADDR=$(dig +short myip.opendns.com @resolver1.opendns.com)
