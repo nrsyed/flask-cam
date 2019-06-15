@@ -3,29 +3,24 @@
 usage() {
   SELF="${0##*/}"
   echo -e "USAGE
-  $SELF [--addr] [--mask] [--help]
+  $SELF [--file <filepath>] [--help]
 
-  Return the local (internal) IP address followed by the subnet mask.
+  Return the local (internal) IP address and subnet mask.
 
-  -a, --addr\t\treturn only the local IP address
-  -m, --mask\t\treturn only the subnet mask
-  -h, --help\t\tprint this message and exit"
+  -f, --file
+      write the IP and subnet mask to a file only if the string is not blank.
+
+  -h, --help
+      print this message and exit"
 
   exit 1
 }
 
-# Determine whether to print only IP, only subnet mask, or both based on
-# argument (or lack thereof).
-PRINT_IP=true
-PRINT_MASK=true
-
 if (( $# > 0 )); then
   case "$1" in
-    -a|--addr)
-      PRINT_MASK=false
-      ;;
-    -m|--mask)
-      PRINT_IP=false
+    -f|--file)
+      FILEPATH="$2"
+      shift 2
       ;;
     -h|--help|*)
       usage
@@ -46,14 +41,15 @@ IP_REGEX='inet [a-zA-Z\:]*(192\.168|10\.[0-9]+|172\.1[6789]|172\.2[0-9]|172\.3[0
 MASK_REGEX='mask[ \:]*[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+'
 MATCHING_LINE=$(/sbin/ifconfig | egrep "$IP_REGEX")
 
-if $PRINT_IP; then
-  IP_ADDR=$(egrep -o "$IP_REGEX" <<< "$MATCHING_LINE" | egrep -o '[0-9]+.*[0-9]+')
-  echo $IP_ADDR
-fi
+IP_ADDR=$(egrep -o "$IP_REGEX" <<< "$MATCHING_LINE" | egrep -o '[0-9]+.*[0-9]+')
+MASK=$(egrep -o "$MASK_REGEX" <<< "$MATCHING_LINE" | egrep -o '[0-9]+.*[0-9]+')
 
-if $PRINT_MASK; then
-  MASK=$(egrep -o "$MASK_REGEX" <<< "$MATCHING_LINE" | egrep -o '[0-9]+.*[0-9]+')
-  echo $MASK
+RESULT="$IP_ADDR/$MASK"
+
+if [[ -n "$FILEPATH" ]] && [[ -n "$RESULT" ]]; then
+  echo "$RESULT" > "$FILEPATH"
+else
+  echo "$RESULT"
 fi
 
 exit 0
