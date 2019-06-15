@@ -26,14 +26,26 @@ def unauthorized():
 def requires_auth(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
+        # Running a script from Python with subprocess via gunicorn seems to
+        # present many issues, including lack of PATH and inability to resolve
+        # paths even when `shell=True` is passed. Instead, write IP/mask to file
+        # on network up and periodically via network and cron jobs; we check
+        # the contents of said file here to obtain the local IP and subnet mask.
+        # `local_network` file contains IP/subnet in format
+        # `XXX.XXX.XXX.XXX/YYY.YYY.YYY.YYY`.
+    #syslog.syslog("request from {}".format(remote_addr))
+
+        filepath = os.path.join(sys.path[0], "tmp/local_network")
+        with open(filepath, "r") as file_:
+            ip_mask = file_.readline().strip()
+        subnet = ip_network(ip_mask, strict=False)
+
+        # TODO: error handling for file read or invalid file contents
+
         # Get IP address of requester using nginx header. Do not require
         # authentication for requests originating on the local network.
-        ip_script_path = os.path.join(sys.path[0], "scripts/get_local_ip.sh")
-        script_output = subprocess.check_output(ip_script_path)
-        ip_addr, subnet_mask = script_output.decode("utf-8").strip().split()
-        subnet = ip_network("{}/{}".format(ip_addr, subnet_mask), strict=False)
-
         remote_addr = request.environ.get("HTTP_X_FORWARDED_FOR")
+        syslog.syslog("request from {}".format(remote_addr))
         if remote_addr is None or ip_address(remote_addr) not in subnet:
             auth = request.authorization
             if not auth or not authenticate_user(auth.username, auth.password, "users"):
@@ -45,7 +57,6 @@ def requires_auth(func):
 @requires_auth
 def index():
     remote_addr = request.environ.get("HTTP_X_FORWARDED_FOR")
-    syslog.syslog("request from {}".format(remote_addr))
     return render_template("index.html")
 
 @app.route("/stream")
