@@ -6,6 +6,23 @@ SCRIPTS_DIR=$(readlink -f $(dirname "$0"))
 # Application temp directory (flask-cam/tmp).
 APP_TMP_DIR=$(readlink -f "$SCRIPTS_DIR/../tmp")
 
+UNINSTALL=false
+
+while (( $# > 0 )); do
+  case "$1" in
+    uninstall)
+      UNINSTALL=true
+      shift 1
+      ;;
+  esac
+done
+
+if $UNINSTALL; then
+  [[ ! -f /etc/network/if-up.d/get_local_ip ]] || sudo rm /etc/network/if-up.d/get_local_ip
+  [[ ! -f /etc/cron.d/get_local_ip ]] || sudo rm /etc/cron.d/get_local_ip
+  exit 0
+fi
+
 # Create flask-cam/tmp if it doesn't exist.
 [[ -d "$APP_TMP_DIR" ]] || mkdir -p "$APP_TMP_DIR"
 
