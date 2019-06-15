@@ -11,6 +11,31 @@ PYTHON_DIR=$(dirname "$(which python)")
 
 THREADS=5
 TIMEOUT=30
+UNINSTALL=false
+
+while (( $# > 0 )); do
+  case "$1" in
+    --threads)
+      THREADS="$2"
+      shift 2
+      ;;
+    --timeout)
+      TIMEOUT="$2"
+      shift 2
+      ;;
+    uninstall)
+      UNINSTALL=true
+      shift 1
+      ;;
+  esac
+done
+
+if $UNINSTALL; then
+  sudo systemctl stop flaskcam
+  sudo systemctl disable flaskcam
+  sudo rm /etc/systemd/system/flaskcam.service
+  exit 0
+fi
 
 # Add a systemd unit file in /etc/systemd/system to start a gunicorn instance
 # to run the app.
