@@ -8,15 +8,20 @@ SCRIPTS_DIR=$(readlink -f $(dirname "$0"))
 # Main application directory one level above this one.
 APP_DIR=$(readlink -f "$SCRIPTS_DIR/..")
 
-# TODO: require port number as argument to script.
-PORT=9001
-
+PORT=""
 UNINSTALL=false
 
 while (( $# > 0 )); do
   case "$1" in
+    --port)
+      PORT="$2"
+      shift 2
+      ;;
     uninstall)
       UNINSTALL=true
+      shift 1
+      ;;
+    *)
       shift 1
       ;;
   esac
@@ -27,6 +32,11 @@ if $UNINSTALL; then
   [[ ! -f /etc/nginx/sites-enabled/flaskcam ]] || sudo rm /etc/nginx/sites-enabled/flaskcam
   # TODO: undo ufw port allow
   exit 0
+fi
+
+if [[ -z "$PORT" ]]; then
+  echo "Error: port required (use --port)"
+  exit 1
 fi
 
 # Addresses in the private IP space begin with one of three blocks:

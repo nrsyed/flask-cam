@@ -5,11 +5,16 @@ APP_DIR=$(readlink -f $(dirname "$0"))
 
 SCRIPTS_DIR="$APP_DIR/scripts"
 
+PORT=""
 UNINSTALL=false
 SKIP_OPENCV=false
 
 while (( $# > 0 )); do
   case "$1" in
+    -p|--port)
+      PORT="$2"
+      shift 2
+      ;;
     --skip-opencv)
       SKIP_OPENCV=true
       shift 1
@@ -33,6 +38,11 @@ if $UNINSTALL; then
   exit 0
 fi
 
+if [[ -z "$PORT" ]]; then
+  echo "Error: port required (use --port)"
+  exit 1
+fi
+
 sudo apt update && sudo apt upgrade
 sudo apt -y install dnsutils libffi-dev nginx uvcdynctrl
 
@@ -42,10 +52,9 @@ $SKIP_OPENCV || pip install opencv-python
 
 cd "$SCRIPTS_DIR"
 ./make_systemd_file.sh
-./make_nginx_config.sh
+./make_nginx_config.sh --port $PORT
 ./make_local_ip_jobs.sh
 ./make_external_ip_check_cronjob.sh
-
 
 printf "Add authenticated user now? (y/n): "
 read SELECTION
