@@ -16,7 +16,7 @@ usage() {
   exit 1
 }
 
-if (( $# > 0 )); then
+while (( $# > 0 )); do
   case "$1" in
     -f|--file)
       FILEPATH="$2"
@@ -26,7 +26,7 @@ if (( $# > 0 )); then
       usage
       ;;
   esac
-fi
+done
 
 # Addresses in the private IP space begin with one of three blocks:
 # 10.X.X.X
