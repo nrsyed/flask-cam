@@ -31,8 +31,8 @@ if $UNINSTALL; then
   # Determine port from nginx config file.
   PORT=$(grep listen /etc/nginx/sites-available/flaskcam | egrep -o '[0-9]+')
   sudo ufw delete allow $PORT
-  [[ ! -f /etc/nginx/sites-available/flaskcam ]] || sudo rm /etc/nginx/sites-available/flaskcam
   [[ ! -f /etc/nginx/sites-enabled/flaskcam ]] || sudo rm /etc/nginx/sites-enabled/flaskcam
+  [[ ! -f /etc/nginx/sites-available/flaskcam ]] || sudo rm /etc/nginx/sites-available/flaskcam
   exit 0
 fi
 

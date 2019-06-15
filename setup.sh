@@ -44,7 +44,7 @@ if [[ -z "$PORT" ]]; then
 fi
 
 sudo apt update && sudo apt upgrade
-sudo apt -y install dnsutils libffi-dev nginx uvcdynctrl
+sudo apt -y install dnsutils libffi-dev net-tools nginx uvcdynctrl
 
 cd "$APP_DIR"
 pip install -r requirements.txt
