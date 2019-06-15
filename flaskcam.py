@@ -33,20 +33,21 @@ def requires_auth(func):
         # the contents of said file here to obtain the local IP and subnet mask.
         # `local_network` file contains IP/subnet in format
         # `XXX.XXX.XXX.XXX/YYY.YYY.YYY.YYY`.
-    #syslog.syslog("request from {}".format(remote_addr))
 
+        subnet = None
         filepath = os.path.join(sys.path[0], "tmp/local_network")
-        with open(filepath, "r") as file_:
-            ip_mask = file_.readline().strip()
-        subnet = ip_network(ip_mask, strict=False)
-
-        # TODO: error handling for file read or invalid file contents
+        try:
+            with open(filepath, "r") as file_:
+                local_ip_and_mask = file_.readline().strip()
+            subnet = ip_network(local_ip_and_mask, strict=False)
+        except Exception as e:
+            syslog.syslog(str(e))
 
         # Get IP address of requester using nginx header. Do not require
         # authentication for requests originating on the local network.
         remote_addr = request.environ.get("HTTP_X_FORWARDED_FOR")
         syslog.syslog("request from {}".format(remote_addr))
-        if remote_addr is None or ip_address(remote_addr) not in subnet:
+        if remote_addr is None or subnet is None or ip_address(remote_addr) not in subnet:
             auth = request.authorization
             if not auth or not authenticate_user(auth.username, auth.password, "users"):
                 return unauthorized()
