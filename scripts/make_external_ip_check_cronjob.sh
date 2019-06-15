@@ -6,6 +6,8 @@ SCRIPTS_DIR=$(readlink -f $(dirname "$0"))
 # Path to cron job file.
 CRON_JOB_PATH=/etc/cron.d/external_ip_check
 
+# TODO: add job interval as argument
+
 UNINSTALL=false
 
 while (( $# > 0 )); do
@@ -19,6 +21,7 @@ done
 
 if $UNINSTALL; then
   [[ ! -f "$CRON_JOB_PATH" ]] || sudo rm "$CRON_JOB_PATH"
+  exit 0
 fi
 
 # Add a file to /etc/cron.d for a job that runs flask-cam/scripts/ipcheck.sh

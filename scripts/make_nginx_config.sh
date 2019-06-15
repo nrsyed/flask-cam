@@ -11,6 +11,24 @@ APP_DIR=$(readlink -f "$SCRIPTS_DIR/..")
 # TODO: require port number as argument to script.
 PORT=9001
 
+UNINSTALL=false
+
+while (( $# > 0 )); do
+  case "$1" in
+    uninstall)
+      UNINSTALL=true
+      shift 1
+      ;;
+  esac
+done
+
+if $UNINSTALL; then
+  [[ ! -f /etc/nginx/sites-available/flaskcam ]] || sudo rm /etc/nginx/sites-available/flaskcam
+  [[ ! -f /etc/nginx/sites-enabled/flaskcam ]] || sudo rm /etc/nginx/sites-enabled/flaskcam
+  # TODO: undo ufw port allow
+  exit 0
+fi
+
 # Addresses in the private IP space begin with one of three blocks:
 # 10.X.X.X
 # 172.16.X.X - 172.31.X.X
