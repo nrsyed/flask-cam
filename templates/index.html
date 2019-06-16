@@ -7,12 +7,23 @@
     <br>
     <h2>Controls</h2>
     <form id="controls">
-      Brightness: <input id="slider-brightness" type="range" min=0 max=255 step=1 value=0><br>
-      Contrast: <input id="slider-contrast" type="range" min=0 max=255 step=1 value=0><br>
-      Exposure: <input id="slider-exposure" type="range" min=3 max=2047 step=1 value=250><br>
-      Focus: <input id="slider-focus" type="range" min=0 max=250 step=5 value=0><br>
-      Zoom: <input id="slider-zoom" type="range" min=100 max=500 step=1 value=100><br>
-      Delay: <input id="num-delay" type="number" min=0 step=0.02 value=0.1><br>
+      Brightness: <input id="control-brightness" type="number" min=0 max=255 step=1 value=0>
+      <span id="brightness">0</span><br>
+
+      Contrast: <input id="control-contrast" type="number" min=0 max=255 step=1 value=0>
+      <span id="contrast">0</span><br>
+
+      Exposure: <input id="control-exposure" type="number" min=3 max=2047 step=1 value=250>
+      <span id="exposure">0</span><br>
+
+      Focus: <input id="control-focus" type="number" min=0 max=250 step=5 value=0>
+      <span id="focus">0</span><br>
+
+      Zoom: <input id="control-zoom" type="number" min=100 max=500 step=1 value=100>
+      <span id="zoom">100</span><br>
+
+      Delay: <input id="control-delay" type="number" min=0 step=0.02 value=0.1>
+      <span id="delay">0.1</span><br>
       <input id="submit" type="submit" value="Set">
     </form>
   </body>

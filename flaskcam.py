@@ -6,7 +6,7 @@ import sys
 import syslog
 import time
 
-from flask import Flask, render_template, Response, request, current_app
+from flask import Flask, jsonify, render_template, Response, request, current_app
 
 from camera import Camera
 from password import authenticate_user
@@ -64,6 +64,24 @@ def index():
 def stream():
     mimetype = "multipart/x-mixed-replace; boundary=frame-boundary"
     return Response(gen(), mimetype=mimetype)
+
+@app.route("/get", methods=["GET"])
+def get():
+    controls = [
+        "autofocus",
+        "brightness",
+        "contrast",
+        "exposure",
+        "focus",
+        "saturation",
+        "zoom"
+    ]
+
+    control_values = dict()
+    for control in controls:
+        control_values[control] = cam.get_control_value(control)
+    control_values["delay"] = current_app.delay
+    return jsonify(control_values)
 
 @app.route("/submit", methods=["POST"])
 def submit():

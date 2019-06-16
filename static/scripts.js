@@ -24,9 +24,26 @@ function sendRequest(formData) {
 	};
 }
 
+function getControlValues() {
+  let url = "/get";
+  let request = new XMLHttpRequest();
+  request.open("GET", url, true);
+  request.send();
+  request.onload = function() {
+    let response = JSON.parse(request.responseText);
+    for (let control in response) {
+      let indicator = document.getElementById(control);
+      console.log(control);
+      console.log(indicator);
+    }
+  };
+}
+
 function init() {
 	form = document.getElementById("controls");
 	form.addEventListener("submit", formSubmit);
+
+  getControlValues();
 }
 
 init();
