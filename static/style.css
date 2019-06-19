@@ -1,0 +1,12 @@
+.grid-container {
+  display: grid;
+  grid-template-columns: 120px 80px 80px 120px;
+}
+
+input[type=number] {
+  width: 70%;
+}
+
+.header-row {
+  font-weight: bold;
+}
