@@ -14,6 +14,7 @@ class Camera():
 
         # Control name strings (use uvcdynctrl -c for a given device to
         # obtain the correct names).
+        auto_exposure = control_names.get("auto_exposure",  "Exposure, Auto")
         autofocus = control_names.get("autofocus", "Focus, Auto")
         brightness = control_names.get("brightness", "Brightness")
         contrast = control_names.get("contrast", "Contrast")
@@ -50,7 +51,7 @@ class Camera():
 
 
     def set_control_value(self, control, value):
-        # Full path to uvcdynctrl needed if running via nginx/www-data user.
+        # Full path to uvcdynctrl needed.
         control_name = self.control_names[control]
         subprocess.call(
             ["/usr/bin/uvcdynctrl", "-d", self.device_name, "-s", control_name, str(value)]
