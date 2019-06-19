@@ -1,35 +1,59 @@
 <html>
   <head>
     <title>Live Feed</title>
+    <link rel="stylesheet" type="text/css" href="static/style.css">
   </head>
   <body>
     <img src="{{ url_for('stream') }}">
     <br>
     <h2>Controls</h2>
     <form id="controls">
-      Brightness: <input id="control-brightness" type="number" min=0 max=255 step=1 value=0>
-      <span id="brightness">0</span><br>
+      <div class="grid-container">
+        <span class="header-row">Control</span>
+        <span class="header-row">Range</span>
+        <span class="header-row">Set</span>
+        <span class="header-row">Current value</span>
 
-      Contrast: <input id="control-contrast" type="number" min=0 max=255 step=1 value=0>
-      <span id="contrast">0</span><br>
+        <span class="label">Brightness</span>
+        <span class="range">0–255</span>
+        <input id="set-brightness" type="number" min=0 max=255 step=1 value=0>
+        <span id="brightness">0</span>
 
-      Exposure: <input id="control-exposure" type="number" min=3 max=2047 step=1 value=250>
-      <span id="exposure">0</span><br>
+        <span class="label">Contrast</span>
+        <span class="range">0–255</span>
+        <input id="set-contrast" type="number" min=0 max=255 step=1 value=0>
+        <span id="contrast">0</span>
 
-      Autofocus: <input id="control-autofocus" type="checkbox" value="autofocus">
-      <input id="autofocus" type="checkbox" checked="checked" onclick="return false;"><br>
+        <span class="label">Exposure</span>
+        <span class="range">3–2047</span>
+        <input id="set-exposure" type="number" min=3 max=2047 step=1 value=250>
+        <span id="exposure">0</span>
 
-      Focus: <input id="control-focus" type="number" min=0 max=250 step=5 value=0>
-      <span id="focus">0</span><br>
+        <span class="label">Autofocus</span>
+        <span class="range">on/off</span>
+        <input id="set-autofocus" type="checkbox" value="autofocus">
+        <input id="autofocus" type="checkbox" checked="checked" onclick="return false;">
 
-      Saturation: <input id="control-saturation" type="number" min=0 max=255 step=1 value=0>
-      <span id="saturation">0</span><br>
+        <span class="label">Focus</span>
+        <span class="range">0–250</span>
+        <input id="set-focus" type="number" min=0 max=250 step=5 value=0>
+        <span id="focus">0</span>
 
-      Zoom: <input id="control-zoom" type="number" min=100 max=500 step=1 value=100>
-      <span id="zoom">100</span><br>
+        <span class="label">Saturation</span>
+        <span class="range">0–255</span>
+        <input id="set-saturation" type="number" min=0 max=255 step=1 value=0>
+        <span id="saturation">0</span>
 
-      Delay: <input id="control-delay" type="number" min=0 step=0.02 value=0.1>
-      <span id="delay">0.1</span><br>
+        <span class="label">Zoom</span>
+        <span class="range">100–500</span>
+        <input id="set-zoom" type="number" min=100 max=500 step=1 value=100>
+        <span id="zoom">100</span>
+
+        <span class="label">Delay (s)</span>
+        <span class="range">&ge; 0</span>
+        <input id="set-delay" type="number" min=0 step=0.02 value=0.1>
+        <span id="delay">0.1</span>
+      </div>
       <input id="submit" type="submit" value="Set">
     </form>
   </body>
