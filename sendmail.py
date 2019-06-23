@@ -4,6 +4,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import json
 import smtplib
+import syslog
 
 def import_secrets(filename):
     """
@@ -46,8 +47,11 @@ def send_mail(
         server.close()
     except Exception as e:
         print(e)
+        syslog.syslog(str(e))
     else:
-        print("Email sent successfully")
+        msg = "Email sent to {}".format(recipient)
+        print(msg)
+        syslog.syslog(msg)
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
