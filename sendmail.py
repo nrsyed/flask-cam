@@ -27,7 +27,7 @@ def import_secrets(filename):
 
 def send_mail(
     sender, sender_name, recipient, smtp_username, smtp_password, host, port,
-    subject, body
+    subject, body, verbose=False
 ):
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
@@ -46,12 +46,14 @@ def send_mail(
         server.sendmail(sender, recipient, msg.as_string())
         server.close()
     except Exception as e:
-        print(e)
         syslog.syslog(str(e))
+        if verbose:
+            print(e)
     else:
         msg = "Email sent to {}".format(recipient)
-        print(msg)
         syslog.syslog(msg)
+        if verbose:
+            print(msg)
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
@@ -60,7 +62,14 @@ if __name__ == "__main__":
         "-f", "--filepath", default="secrets", help="Path to secrets file"
     )
     argparser.add_argument("-s", "--subject", type=str, default="")
+    argparser.add_argument("-v", "--verbose", action="store_true")
     args = argparser.parse_args()
+    body = args.body
+    subject = args.subject
+    verbose = args.verbose
 
     secrets = import_secrets(args.filepath)
-    send_mail(body=args.body, subject=args.subject, **secrets)
+    send_mail(body=body, subject=subject, verbose=verbose, **secrets)
+
+
+
