@@ -26,8 +26,9 @@ IP_ADDR=$(dig +short myip.opendns.com @resolver1.opendns.com)
 # Redirect current IP address to flask-cam/tmp/ipaddress if file doesn't exist
 # or if file exists and current IP address different from previous.
 # If IP changed (or on first run), run `sendmail.py` Python script to send
-# email alert with new external IP address in the body.
-if [ ! -f "$FILEPATH" ] || [ "$IP_ADDR" != "$(cat "$FILEPATH")" ]; then
+# email alert with new external IP address in the body (only if IP address
+# returned above is not empty).
+if [ -n "$IP_ADDR" ] && ([ ! -f "$FILEPATH" ] || [ "$IP_ADDR" != "$(cat "$FILEPATH")" ]); then
   echo "IP changed"
   echo $IP_ADDR > "$FILEPATH"
   cd "$APP_DIR"
