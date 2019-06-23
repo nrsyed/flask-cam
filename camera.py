@@ -62,6 +62,11 @@ class Camera():
         value = subprocess.check_output(
             ["/usr/bin/uvcdynctrl", "-d", self.device_name, "-g", control_name]
         )
+        value = int(value.decode("utf-8").strip())
+
+        # Return a boolean for autofocus; otherwise, return raw int.
+        if control == "autofocus":
+            return value == 1
         return int(value.decode("utf-8").strip())
 
     def __del__(self):
