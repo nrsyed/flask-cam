@@ -1,85 +1,78 @@
-# Raspberry Pi internet streaming Flask webcam server
+# Raspberry Pi internet-streaming interactive Flask webcam server
 
 ## Overview
 &#35; TODO
 
-## Installation and setup
+## Installation
 
-Install the necessary system packages. Note that this repository relies on
-`uvcdynctrl` because it assumes that a webcam supported by `uvcdynctrl` is
-being used. If this is not the case, installation of `uvcdynctrl` may be
-omitted and `camera.py` must be modified based on the specifics of your
-particular webcam(s).
-
-```
-sudo apt -y install dnsutils libffi-dev nginx uvcdynctrl
-```
-
-Clone this repository, then install the necessary Python packages, preferably
-in a virtual environment. Note that OpenCV is also required but is not listed
-in `requirements.txt`. It may be built/installed manually (for example, using
-the instructions at
-<a href="https://www.pyimagesearch.com/2018/09/26/install-opencv-4-on-your-raspberry-pi/">
-pyimagesearch</a>) or via the prebuilt `opencv-python` package on PyPI.
-
+Simply clone this repository and run `setup.sh` in the top-level directory,
+specifying the port you'd like the server to listen on (i.e., the port that
+will be opened up to the world) with the `-p`/`--port` flag:
 
 ```
 git clone https://github.com/nrsyed/flask-cam.git
 cd flask-cam
-pip install -r requirements.txt
+./setup.sh --port 9001
 ```
 
-Ensure your Python virtual environment is activated (if using one), *then* run
-`make_systemd_file.sh` in the `scripts` directory to create a systemd unit file
-that will allow Gunicorn to serve the application as a service, named `flaskcam`.
+Replace `9001` with the port you wish to use. Note that the standard HTTP port
+is 80, but it may be prudent to choose a different port for obscurity. After
+the necessary packages have been installed and configuration files have been
+created, the script will allow you to choose whether to set up an authorized
+username/password. This username and password will be required by the web
+interface to view the livestream webpage. For more information on user
+authentication, see the [User Authentication](#user-authentication) section
+below.
+
+As part of the installation process, the `opencv-python` Python package is
+installed. However, some users may wish to build/install OpenCV manually (for
+example, using the instructions at
+<a href="https://www.pyimagesearch.com/2018/09/26/install-opencv-4-on-your-raspberry-pi/">
+pyimagesearch</a>). For this reason, `opencv-python` is not included in
+`requirements.txt` (but is installed by `setup.sh`). If you wish to skip
+installation of `opencv-python`, pass the `--skip-opencv` flag to `setup.sh`:
 
 ```
-scripts/make_systemd_file.sh
+./setup.sh --port 9001 --skip-opencv
 ```
 
-To configure Nginx to properly route requests to gunicorn, create the file
-`/etc/nginx/sites-available/flaskcam` and fill it out as follows, replacing the
-port `9001` with the port you'd like your server to use, the sample IP address
-`192.168.1.101` with the IP address of your Raspberry Pi on your local network
-(which can be found with the `ifconfig` command), and the path to the flask-cam
-repository directory (`/home/pi/flask-cam/`) with your own, if you've placed it
-in a different directory. Note that the standard HTTP port is 80, but it may be
-prudent to choose a different port for obscurity.
+**NOTE**: This project relies on `uvcdynctrl` because it assumes that a webcam
+supported by `uvcdynctrl` is being used. If this is not the case, `camera.py`
+must be modified based on the specifics of your particular webcam(s).
+
+**IMPORTANT**: If you wish to run the program in a Python virtual environment
+(which is recommended), ensure that the virtual is activated before running
+`setup.sh`.
+
+The final step is modifying your router's port forwarding settings (assuming
+you're accessing the internet from behind a router) to forward the port
+previously selected (9001 in the example above) to your Raspberry Pi's local
+IP address, which can be obtained via `ifconfig`.
+
+To access the app, use your public IP address and the port you chose above.
+You can obtain your public IP address using the `dig` tool, which is part of
+the `dnsutils` package and is installed by `setup.sh`.
 
 ```
-server {
-    listen 9001;
-    server_name 192.168.1.101
-
-    location / {
-        include proxy_params;
-        proxy_pass http://unix:/home/pi/flask-cam/flaskcam.sock;
-    }
-}
+dig +short myip.opendns.com @resolver1.opendns.com
+999.9.999.999
 ```
 
-Enable this configuration by symlinking it in the Nginx `sites-enabled` directory.
+Then, to access the index page of the app, simply navigate to
+`123.4.567.890:9001` in a web browser, replacing `123.4.567.890` with the IP
+address returned by `dig` and `9001` with the port you chose previously.
+
+### Uninstallation
+
+To uninstall all components and configuration files, simply run `setup.sh` with
+the `uninstall` option:
 
 ```
-sudo ln -s /etc/nginx/sites-available/flaskcam /etc/nginx/sites-enabled
+./setup.sh uninstall
 ```
 
-Test the configuration file you just created by running `nginx` with the `-t`
-flag. If this indicates no errors, restart the Nginx service to effect the
-changes.
 
-```
-sudo nginx -t
-sudo systemctl restart nginx
-```
-
-Assuming you're running
-<a href="https://wiki.archlinux.org/index.php/Uncomplicated_Firewall">ufw</a>,
-allow connections on the port you chose above.
-
-```
-sudo ufw allow 9001
-```
+## User authentication
 
 The Flask application requires username/password authentication to access the
 index page. Passwords are encrypted and authenticated via `bcrypt`. To add a
@@ -97,26 +90,6 @@ which contains the username and the base-64 encoded hash of the password.
 Additional users can be added by the same process. For more information on
 working with the list of allowed users, refer to the section on
 <a href="#user-authentication">user authentication</a> below.
-
-The final step is modifying your router's port forwarding settings (assuming
-you're accessing the internet from behind a router) to forward the port
-previously selected (9001 in the example above) to your Raspberry Pi's local
-IP address, which, again, can be obtained via `ifconfig`.
-
-To access the app, use your public IP address and the port you chose above.
-You can obtain your public IP address using the `dig` tool, which is part of
-the `dnsutils` package.
-
-```
-dig +short myip.opendns.com @resolver1.opendns.com
-999.9.999.999
-```
-
-Then, to access the index page of the app, simply navigate to
-`999.9.999.999:9001` in a web browser, replacing `999.9.999.999` with the IP
-address returned by `dig` and `9001` with the port you chose previously.
-
-## User authentication
 
 To modify an existing user's password or to delete a user from the list, use
 the `-m`/`--modify-user` and `-d`/`--delete-user` flags, respectively.
