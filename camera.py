@@ -67,7 +67,7 @@ class Camera():
         # Return a boolean for autofocus; otherwise, return raw int.
         if control == "autofocus":
             return value == 1
-        return int(value.decode("utf-8").strip())
+        return value
 
     def __del__(self):
         self.cap.release()
