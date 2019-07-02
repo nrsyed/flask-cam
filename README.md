@@ -7,7 +7,9 @@
 
 Simply clone this repository and run `setup.sh` in the top-level directory,
 specifying the port you'd like the server to listen on (i.e., the port that
-will be opened up to the world) with the `-p`/`--port` flag:
+will be opened up to the world) with the `-p`/`--port` flag. **IMPORTANT**:
+If you wish to run the program in a Python virtual environment (which is
+recommended), ensure that the virtual is activated before running `setup.sh`.
 
 ```
 git clone https://github.com/nrsyed/flask-cam.git
@@ -15,14 +17,13 @@ cd flask-cam
 ./setup.sh --port 9001
 ```
 
-Replace `9001` with the port you wish to use. Note that the standard HTTP port
-is 80, but it may be prudent to choose a different port for obscurity. After
+Replace `9001` with the port you wish to use (the standard HTTPS port
+is 443, but it may be prudent to choose a different port for obscurity). After
 the necessary packages have been installed and configuration files have been
-created, the script will allow you to choose whether to set up an authorized
-username/password. This username and password will be required by the web
-interface to view the livestream webpage. For more information on user
-authentication, see the [User Authentication](#user-authentication) section
-below.
+created, the script will allow prompt you to set up an authorized
+username/password. These will be required by the web interface to view the
+livestream webpage. For more information on user authentication, see the
+[User Authentication](#user-authentication) section below.
 
 As part of the installation process, the `opencv-python` Python package is
 installed. However, some users may wish to build/install OpenCV manually (for
@@ -40,14 +41,11 @@ installation of `opencv-python`, pass the `--skip-opencv` flag to `setup.sh`:
 supported by `uvcdynctrl` is being used. If this is not the case, `camera.py`
 must be modified based on the specifics of your particular webcam(s).
 
-**IMPORTANT**: If you wish to run the program in a Python virtual environment
-(which is recommended), ensure that the virtual is activated before running
-`setup.sh`.
-
-The final step is modifying your router's port forwarding settings (assuming
-you're accessing the internet from behind a router) to forward the port
-previously selected (9001 in the example above) to your Raspberry Pi's local
-IP address, which can be obtained via `ifconfig`.
+Before you can access the webpage from the internet, you must modify your
+router's port forwarding settings to direct traffic on the chosen port (9001 in
+the example above) to the Raspberry Pi. Depending on your router, this may
+require you to know the Raspberry Pi's IP address on the local network, which
+can be obtained via `ifconfig`.
 
 To access the app, use your public IP address and the port you chose above.
 You can obtain your public IP address using the `dig` tool, which is part of
@@ -55,12 +53,11 @@ the `dnsutils` package and is installed by `setup.sh`.
 
 ```
 dig +short myip.opendns.com @resolver1.opendns.com
-999.9.999.999
 ```
 
 Then, to access the index page of the app, simply navigate to
-`123.4.567.890:9001` in a web browser, replacing `123.4.567.890` with the IP
-address returned by `dig` and `9001` with the port you chose previously.
+`https://123.4.567.890:9001` in a web browser, replacing `123.4.567.890` with
+the IP address returned by `dig` and `9001` with the selected port.
 
 ### Uninstallation
 
