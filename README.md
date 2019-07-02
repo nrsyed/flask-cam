@@ -20,8 +20,8 @@ cd flask-cam
 Replace `9001` with the port you wish to use (the standard HTTPS port
 is 443, but it may be prudent to choose a different port for obscurity). After
 the necessary packages have been installed and configuration files have been
-created, the script will allow prompt you to set up an authorized
-username/password. These will be required by the web interface to view the
+created, the script will prompt you to set up an authorized username/password.
+These credentials will be required by the web interface to view the
 livestream webpage. For more information on user authentication, see the
 [User Authentication](#user-authentication) section below.
 
