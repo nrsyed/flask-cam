@@ -57,7 +57,7 @@ dig +short myip.opendns.com @resolver1.opendns.com
 
 Then, to access the index page of the app, simply navigate to
 `https://123.4.567.890:9001` in a web browser, replacing `123.4.567.890` with
-the IP address returned by `dig` and `9001` with the selected port.
+the IP address returned by `dig` and `9001` with the port selected above.
 
 ### Uninstallation
 
@@ -84,9 +84,7 @@ python password.py --add-user --user dexter --password omelet
 
 By default, this creates a file named `users` in the application directory,
 which contains the username and the base-64 encoded hash of the password.
-Additional users can be added by the same process. For more information on
-working with the list of allowed users, refer to the section on
-<a href="#user-authentication">user authentication</a> below.
+Additional users can be added by the same process.
 
 To modify an existing user's password or to delete a user from the list, use
 the `-m`/`--modify-user` and `-d`/`--delete-user` flags, respectively.
