@@ -100,6 +100,14 @@ python password.py --delete-user dexter
 To check a user's password, use the `-c`/`--check-password` flag, which prints
 `True` if the password given is correct and `False` otherwise.
 
+```
+$ python password.py --check-password --user dexter --password 1234
+False
+
+$ python password.py --check-password --user dexter --password hunter2
+True
+```
+
 ## Email alerts
 
 There are a number of ways to send email alerts initiated by events on the
