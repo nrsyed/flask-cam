@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Create a cron job to run external IP check script.
+
 # Where this script lives, i.e., the /scripts directory.
 SCRIPTS_DIR=$(readlink -f $(dirname "$0"))
 

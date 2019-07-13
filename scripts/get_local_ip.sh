@@ -8,7 +8,7 @@ usage() {
   Return the local (internal) IP address and subnet mask.
 
   -f, --file
-      write the IP and subnet mask to a file only if the string is not blank.
+      write the IP and subnet mask to a file (only if the string is not blank).
 
   -h, --help
       print this message and exit"

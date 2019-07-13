@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Create a script to run local IP check script on network interface up and
+# a cron job to run same script periodically.
+
 # Where this script lives (flask-cam/scripts).
 SCRIPTS_DIR=$(readlink -f $(dirname "$0"))
 

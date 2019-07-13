@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Create systemd unit file to create the `flaskcam` service.
+
 # Where this script lives, i.e., flask-cam/scripts
 SCRIPTS_DIR=$(readlink -f $(dirname "$0"))
 

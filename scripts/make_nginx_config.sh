@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Create nginx config files and add ufw allowed port.
+
 set -e
 
 # Where this script lives, i.e., flask-cam/scripts
