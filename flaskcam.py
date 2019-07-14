@@ -85,18 +85,20 @@ def get():
 
 @app.route("/submit", methods=["POST"])
 def submit():
-    brightness = int(request.form["slider-brightness"])
-    contrast = int(request.form["slider-contrast"])
-    exposure = int(request.form["slider-exposure"])
-    focus = int(request.form["slider-focus"])
-    zoom = int(request.form["slider-zoom"])
-    current_app.delay = float(request.form["num-delay"])
+    brightness = int(request.form["brightness"])
+    contrast = int(request.form["contrast"])
+    exposure = int(request.form["exposure"])
+    focus = int(request.form["focus"])
+    zoom = int(request.form["zoom"])
+    current_app.delay = float(request.form["delay"])
 
     cam.set_control_value("brightness", brightness)
     cam.set_control_value("contrast", contrast)
     cam.set_control_value("exposure", exposure)
     cam.set_control_value("focus", focus)
     cam.set_control_value("zoom", zoom)
+
+    # TODO: response
     return "ok"
 
 def gen():

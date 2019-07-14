@@ -8,8 +8,14 @@ function formSubmit(event) {
   let request = new XMLHttpRequest();
   let formData = new FormData();
 
-  for (input of event.target.querySelectorAll("input")) {
-  	formData.append(input.id, input.value);
+  let controlList = [
+    "brightness", "contrast", "exposure", "focus", "saturation", "zoom", "delay"
+  ];
+
+  for (let controlName of controlList) {
+    let setQuery = "set " + controlName;
+    let setElement = document.getElementsByClassName(setQuery)[0];
+    formData.append(controlName, setElement.value);
   }
 
   sendRequest(formData);
@@ -71,6 +77,7 @@ function getControlValues(updateSet=false) {
 }
 
 function init() {
+
   form = document.getElementById("controls");
   form.addEventListener("submit", formSubmit);
   getControlValues(updateSet=true);
