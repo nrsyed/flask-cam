@@ -117,4 +117,6 @@ AWS SES (**S**imple **E**mail **S**ervice).
 
 &#35; TODO
 
+<img src="doc/img/aws_ses_smtp.png">
+
 <img src="doc/img/aws_ses.png">
