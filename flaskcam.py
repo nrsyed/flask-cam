@@ -11,19 +11,27 @@ from flask import Flask, jsonify, render_template, Response, request, current_ap
 from camera import Camera
 from password import authenticate_user
 
+
 app = Flask(__name__)
 cam = Camera()
+
 
 @app.before_first_request
 def initialize():
     current_app.delay = 0.1
+
 
 def unauthorized():
     return Response(
         "Credential error", 401, {"WWW-Authenticate": "Basic realm='Login Required'"}
     )
 
+
 def requires_auth(func):
+    """
+    Decorator for routes that require authentication.
+    """
+
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         # Running a script from Python with subprocess via gunicorn seems to
@@ -54,16 +62,18 @@ def requires_auth(func):
         return func(*args, **kwargs)
     return wrapper 
 
+
 @app.route("/")
 @requires_auth
 def index():
-    remote_addr = request.environ.get("HTTP_X_FORWARDED_FOR")
     return render_template("index.html")
+
 
 @app.route("/stream")
 def stream():
     mimetype = "multipart/x-mixed-replace; boundary=frame-boundary"
     return Response(gen(), mimetype=mimetype)
+
 
 @app.route("/get", methods=["GET"])
 def get():
@@ -83,8 +93,14 @@ def get():
     control_values["delay"] = current_app.delay
     return jsonify(control_values)
 
+
 @app.route("/submit", methods=["POST"])
 def submit():
+    """
+    Route called when submitting the control form from the web interface
+    to update camera device and application control values.
+    """
+
     brightness = int(request.form["brightness"])
     contrast = int(request.form["contrast"])
     exposure = int(request.form["exposure"])
@@ -101,14 +117,21 @@ def submit():
     # TODO: response
     return "ok"
 
+
 def gen():
+    """
+    Generator to continuously grab and yield frames from the Camera object.
+    """
+
     while True:
         frame = cam.get_frame()
         yield (b'--frame-boundary\r\nContent-Type: image/jpeg\r\n\r\n'
                 + bytearray(frame) + b'\r\n'
         )
         with app.app_context():
+            # Add nominal delay between frames to prevent performance issues.
             time.sleep(current_app.delay)
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0")
