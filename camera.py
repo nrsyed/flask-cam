@@ -4,16 +4,30 @@ import subprocess
 import cv2
 import numpy as np
 
+
 class Camera():
+    """
+    Class for reading frames from or getting/setting control values for a camera.
+    """
+
     def __init__(self, src=0, device_name="video0", control_names=None):
+        """
+        :param src: VideoCapture source device id or filename.
+        :type src: int | str
+        :param device_name: Camera device name (use `uvcdynctrl --list`).
+        :type device_name: str
+        :param control_names: Dictionary mapping control names used by the
+            Flask application/web interface to the control names used by
+            the device (use `uvcdynctrl --clist` to obtain a list).
+        :type control_names: dict
+        """
+
         self.cap = cv2.VideoCapture(src)
         self.device_name = device_name
 
         if control_names is None:
             control_names = dict()
 
-        # Control name strings (use uvcdynctrl -c for a given device to
-        # obtain the correct names).
         auto_exposure = control_names.get("auto_exposure",  "Exposure, Auto")
         autofocus = control_names.get("autofocus", "Focus, Auto")
         brightness = control_names.get("brightness", "Brightness")
@@ -33,12 +47,22 @@ class Camera():
             "zoom": zoom
         }
 
+
     def get_frame(self):
+        """
+        Read a frame from the VideoCapture object stream, superimpose a
+        timestamp on the frame, and return it encoded as a JPG.
+        """
+
         grabbed, frame = self.cap.read()
 
         if not grabbed:
             self.cap.release()
 
+        # Resize frame to a desired size; since frames are not compressed
+        # before passing them to the web frontend, large frame sizes may reduce
+        # speed/performance.
+        # TODO: add desired frame size as a parameter?
         frame = cv2.resize(frame, (640, 480))
         height, width = frame.shape[:2]
         timestamp = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
@@ -51,13 +75,37 @@ class Camera():
 
 
     def set_control_value(self, control, value):
+        """
+        Call uvcdynctrl in a subprocess to set a control value.
+
+        :param control: Control name/type (e.g., "zoom").
+        :type control: str
+        :param value: New value to set.
+        :type value: int
+        """
+
         # Full path to uvcdynctrl needed.
         control_name = self.control_names[control]
         subprocess.call(
-            ["/usr/bin/uvcdynctrl", "-d", self.device_name, "-s", control_name, str(value)]
+            [
+                "/usr/bin/uvcdynctrl", "-d", self.device_name, "-s",
+                control_name, str(value)
+            ]
         )
 
+
     def get_control_value(self, control):
+        """
+        Call uvcdynctrl in a subprocess to get the current value of a control.
+
+        :param control: Control name/type (e.g., "zoom").
+        :type control: str
+        :return: The control value (as an integer for controls that can take on
+            a range of discrete values, or as a boolean for controls that can
+            be toggled on/off).
+        :rtype: int | str
+        """
+
         control_name = self.control_names[control]
         value = subprocess.check_output(
             ["/usr/bin/uvcdynctrl", "-d", self.device_name, "-g", control_name]
@@ -68,6 +116,7 @@ class Camera():
         if control == "autofocus":
             return value == 1
         return value
+
 
     def __del__(self):
         self.cap.release()
