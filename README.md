@@ -143,12 +143,12 @@ in the navigation bar (refer to the first screenshot above), click
 *Verify a New Email Address*, and follow the instructions to add the email
 address you'd like to send email from.
 
-Finally, copy the sample file `secrets.example` to a file named `secrets` and
-replace the example information with your email address and the AWS SES
-credentials from the previous steps. The secrets file contains all of the
-information needed to communicate with the AWS SES server in the form of a
-JSON object; the file is parsed by the `import_secrets()` function in
-<a href="sendmail.py">`sendmail.py`</a>.
+Finally, copy the sample file <a href="secrets.example">`secrets.example`</a>
+to a file named `secrets` and replace the example information with your email
+address and the AWS SES credentials from the previous steps. The secrets file
+contains all of the information needed to communicate with the AWS SES server
+in the form of a JSON object; the file is parsed by the `import_secrets()`
+function in <a href="sendmail.py">`sendmail.py`</a>.
 
 Currently, an email alert is sent whenever your router's external IP address
 (the IP address that other computers see when any machine on your network
@@ -160,5 +160,5 @@ achieved by means of the <a href="scripts/make_external_ip_check_cronjob.sh">
 adds a cron job to regularly run <a href="scripts/external_ip_check.sh">
 `external_ip_check.sh`</a>, another script that calls `sendmail.py` if the IP
 has changed since the last check. Note that the secrets file does not have to
-be named `secrets`; however, the new name must be passed to `sendmail.py` via
-the `--filepath` option in `external_ip_check.sh`.
+be named `secrets`; however, if a different name is used, it must be passed
+to `sendmail.py` via the `--filepath` option in `external_ip_check.sh`.
