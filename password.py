@@ -5,12 +5,41 @@ import sys
 
 import bcrypt
 
+
 def get_base64_hash(password):
+    """
+    Return a string corresponding to a salted, bcrypt-hashed base-64
+    representation of a password.
+
+    :param password: The password to be salted and hashed.
+    :type password: str
+    :return: The base-64 representation of the hashed password.
+    :rtype: str
+    """
+
     hashed = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
     hashed64 = base64.b64encode(hashed).decode("utf-8")
     return hashed64
 
+
 def add_user(user, password, filepath):
+    """
+    Add an authenticated user.
+
+    NOTE: if a user is already in the list of authenticated users, this
+    function will do nothing. Use :func:`.modify_user` to change the password
+    for an existing user.
+
+    :param user: The new user's name.
+    :type user: str
+    :param password: The new user's password.
+    :type password: str
+    :param filepath: Path to the authenticated users text file.
+    :type filepath: str
+    :return: Boolean indicating whether the user was added.
+    :rtype: bool
+    """
+
     user_in_file = False
     if os.path.isfile(filepath):
         with open(filepath, "r") as file_:
@@ -26,10 +55,36 @@ def add_user(user, password, filepath):
         return True
     return False
 
+
 def authenticate_password(password, hashed):
+    """
+    Determine whether a password corresponds to a hashed password.
+
+    :param password: Password to check.
+    :type password: str
+    :param hashed: (Base-64) hashed representation of a password.
+    :type hashed: str
+    :return: Whether the given password matches the hashed password.
+    :rtype: bool
+    """
     return bcrypt.hashpw(password.encode("utf-8"), hashed) == hashed
 
+
 def authenticate_user(user, password, filepath):
+    """
+    Authenticate a user and password.
+
+    :param user: User name.
+    :type user: str
+    :param password: User password.
+    :type password: str
+    :param filepath: Path to authenticated users text file.
+    :type filepath: str
+    :return: Whether or not the user and password match an entry in the list
+        of authenticated users.
+    :rtype: bool
+    """
+
     if os.path.isfile(filepath):
         with open(filepath, "r") as file_:
             for line in file_:
@@ -39,7 +94,19 @@ def authenticate_user(user, password, filepath):
                     return True
     return False
 
+
 def delete_user(user, filepath):
+    """
+    Remove a user from the list of authenticated users.
+
+    :param user: User name.
+    :type user: str
+    :param filepath: Path to authenticated users text file.
+    :type filepath: str
+    :return: Whether the entry for the user was successfully deleted.
+    :rtype: bool
+    """
+
     user_removed = False
     if os.path.isfile(filepath):
         with open(filepath, "r") as file_:
@@ -55,7 +122,21 @@ def delete_user(user, filepath):
             file_.truncate()
     return user_removed
 
+
 def modify_user(user, password, filepath):
+    """
+    Update the password for an existing user.
+
+    :param user: User name.
+    :type user: str
+    :param password: New password for the user.
+    :type password: str
+    :param filepath: Path to authenticated users text file.
+    :type filepath: str
+    :return: Whether the password for the user was successfully updated.
+    :rtype: bool
+    """
+
     user_modified = False
     if os.path.isfile(filepath):
         with open(filepath, "r") as file_:
@@ -71,6 +152,7 @@ def modify_user(user, password, filepath):
                 else:
                     file_.write(line)
     return user_modified
+
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
