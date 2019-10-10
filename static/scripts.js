@@ -8,18 +8,29 @@ function formSubmit(event) {
   let request = new XMLHttpRequest();
   let formData = new FormData();
 
-  let controlList = [
+  // Iterate through controls with discrete numerical values.
+  let discreteControls = [
     "brightness", "contrast", "exposure", "focus", "saturation", "zoom", "delay"
   ];
+  for (let controlName of discreteControls) {
+    formData.append(
+      controlName,
+      document.getElementsByClassName("set " + controlName)[0].value
+    );
+  }
 
-  for (let controlName of controlList) {
-    let setQuery = "set " + controlName;
-    let setElement = document.getElementsByClassName(setQuery)[0];
-    formData.append(controlName, setElement.value);
+  // Iterate through checkbox controls.
+  let checkboxControls = ["autofocus"];
+  for (let controlName of checkboxControls) {
+    formData.append(
+      controlName,
+      document.getElementsByClassName("set " + controlName)[0].checked
+    );
   }
 
   sendRequest(formData);
 }
+
 
 function sendRequest(formData) {
   /*
@@ -37,6 +48,7 @@ function sendRequest(formData) {
   	console.log("POST error");
   };
 }
+
 
 function getControlValues(updateSet=false) {
   /*
@@ -76,11 +88,12 @@ function getControlValues(updateSet=false) {
   };
 }
 
-function init() {
 
+function init() {
   form = document.getElementById("controls");
   form.addEventListener("submit", formSubmit);
   getControlValues(updateSet=true);
 }
+
 
 init();
