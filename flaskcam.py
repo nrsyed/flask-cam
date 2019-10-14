@@ -101,6 +101,7 @@ def submit():
     to update camera device and application control values.
     """
 
+    autofocus = request.form["autofocus"]
     brightness = int(request.form["brightness"])
     contrast = int(request.form["contrast"])
     exposure = int(request.form["exposure"])
@@ -108,6 +109,7 @@ def submit():
     zoom = int(request.form["zoom"])
     current_app.delay = float(request.form["delay"])
 
+    cam.set_control_value("autofocus", {"true": 1, "false": 0}[autofocus])
     cam.set_control_value("brightness", brightness)
     cam.set_control_value("contrast", contrast)
     cam.set_control_value("exposure", exposure)

@@ -44,14 +44,12 @@ function sendRequest(formData) {
   let request = new XMLHttpRequest();
   request.open("POST", endpoint_url, true);
   request.send(formData);
-  /*
   request.onload = function() {
   	console.log(request.responseText);
   };
   request.onerror = function() {
   	console.log("POST error");
   };
-  */
 }
 
 
@@ -82,6 +80,7 @@ function updateControlValues(current=false, set=false) {
 
 
 function updateCurrentValueElements(newValues) {
+  console.log(newValues);
   for (let controlName in newValues) {
     let currentValueElement = document.getElementsByClassName(
       "current-value " + controlName
@@ -89,9 +88,10 @@ function updateCurrentValueElements(newValues) {
 
     if (currentValueElement) {
       let newValue = newValues[controlName];
-      if (typeof(value) == "boolean") {
-        if (value) {
-          currentValueElement.addAttribute("checked");
+      if (typeof(newValue) === typeof(true)) {
+        console.log(currentValueElement);
+        if (newValue) {
+          currentValueElement.setAttribute("checked", "");
         } else {
           currentValueElement.removeAttribute("checked");
         }
@@ -110,7 +110,17 @@ function updateSetValueElements(newValues) {
     )[0];
 
     if (setValueElement) {
-      setValueElement.value = newValues[controlName];
+      let newValue = newValues[controlName];
+      if (typeof(newValue) === typeof(true)) {
+        console.log(setValueElement);
+        if (newValue) {
+          setValueElement.setAttribute("checked", "");
+        } else {
+          setValueElement.removeAttribute("checked");
+        }
+      } else {
+        setValueElement.textContent = newValue;
+      }
     }
   }
 }
