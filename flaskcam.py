@@ -78,6 +78,7 @@ def stream():
 @app.route("/get", methods=["GET"])
 def get():
     controls = [
+        "autoexposure",
         "autofocus",
         "brightness",
         "contrast",
@@ -101,6 +102,7 @@ def submit():
     to update camera device and application control values.
     """
 
+    autoexposure = request.form["autoexposure"]
     autofocus = request.form["autofocus"]
     brightness = int(request.form["brightness"])
     contrast = int(request.form["contrast"])
@@ -109,6 +111,7 @@ def submit():
     zoom = int(request.form["zoom"])
     current_app.delay = float(request.form["delay"])
 
+    cam.set_control_value("autoexposure", {"true": 3, "false": 1}[autoexposure])
     cam.set_control_value("autofocus", {"true": 1, "false": 0}[autofocus])
     cam.set_control_value("brightness", brightness)
     cam.set_control_value("contrast", contrast)

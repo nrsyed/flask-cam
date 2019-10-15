@@ -24,6 +24,14 @@
         <input class="set contrast" type="number" min=0 max=255 step=1 value=0>
         <span class="current-value contrast">0</span>
 
+        <span class="label">Auto-exposure</span>
+        <span class="range">on/off</span>
+        <input class="set autoexposure" type="checkbox">
+        <input
+          class="current-value autoexposure" type="checkbox"
+          onclick="return false;"
+        >
+
         <span class="label">Exposure</span>
         <span class="range">3–2047</span>
         <input class="set exposure" type="number" min=3 max=2047 step=1 value=250>
@@ -34,7 +42,8 @@
         <input class="set autofocus" type="checkbox">
         <input
           class="current-value autofocus" type="checkbox"
-          onclick="return false;">
+          onclick="return false;"
+        >
 
         <span class="label">Focus</span>
         <span class="range">0–250</span>

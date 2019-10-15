@@ -28,7 +28,7 @@ class Camera():
         if control_names is None:
             control_names = dict()
 
-        auto_exposure = control_names.get("auto_exposure",  "Exposure, Auto")
+        autoexposure = control_names.get("autoexposure",  "Exposure, Auto")
         autofocus = control_names.get("autofocus", "Focus, Auto")
         brightness = control_names.get("brightness", "Brightness")
         contrast = control_names.get("contrast", "Contrast")
@@ -38,6 +38,7 @@ class Camera():
         zoom = control_names.get("zoom", "Zoom, Absolute")
 
         self.control_names = {
+            "autoexposure": autoexposure,
             "autofocus": autofocus,
             "brightness": brightness,
             "contrast": contrast,
@@ -112,9 +113,13 @@ class Camera():
         )
         value = int(value.decode("utf-8").strip())
 
-        # Return a boolean for autofocus; otherwise, return raw int.
+        # Return a boolean for autofocus and autoexposure; otherwise,
+        # return raw int.
         if control == "autofocus":
             return value == 1
+        elif control == "autoexposure":
+            # Options are 1 (manual mode) and 3 (aperture priority mode).
+            return value == 3
         return value
 
 

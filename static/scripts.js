@@ -20,7 +20,7 @@ function formSubmit(event) {
   }
 
   // Iterate through checkbox controls.
-  let checkboxControls = ["autofocus"];
+  let checkboxControls = ["autoexposure", "autofocus"];
   for (let controlName of checkboxControls) {
     formData.append(
       controlName,
