@@ -131,3 +131,5 @@ function init() {
 
 
 init();
+
+setInterval(updateControlValues, 10000, true, false);
