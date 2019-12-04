@@ -69,6 +69,12 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/kiosk")
+@requires_auth
+def kiosk():
+    return render_template("kiosk.html")
+
+
 @app.route("/stream")
 def stream():
     mimetype = "multipart/x-mixed-replace; boundary=frame-boundary"
