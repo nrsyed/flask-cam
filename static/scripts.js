@@ -53,6 +53,26 @@ function sendRequest(formData) {
 }
 
 
+function formStream(event) {
+  event.preventDefault();
+
+  let fps = document.getElementsByClassName("set-fps")[0].value
+  let width = document.getElementsByClassName("set-width")[0].value
+  let height = document.getElementsByClassName("set-height")[0].value
+
+  let formData = new FormData();
+  formData.append("fps", fps)
+  formData.append("width", width)
+  formData.append("height", height)
+
+  let request = new XMLHttpRequest();
+  request.open("POST", "/stream", true);
+  request.send(formData);
+
+  updateControlValues(updateCurrent=false);
+}
+
+
 function updateControlValues(current=false, set=false) {
   /**
    * Get the current values of each control from the webcam server and
@@ -124,8 +144,12 @@ function updateSetValueElements(newValues) {
 
 
 function init() {
-  form = document.getElementById("controls");
-  form.addEventListener("submit", formSubmit);
+  form_controls = document.getElementById("controls");
+  form_controls.addEventListener("submit", formSubmit);
+
+  form_screen = document.getElementById("screen-resolution");
+  form_screen.addEventListener("submit", formStream);
+
   updateControlValues(updateCurrent=true, updateSet=true);
 }
 
