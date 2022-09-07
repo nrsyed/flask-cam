@@ -32,5 +32,5 @@ if [ -n "$IP_ADDR" ] && ([ ! -f "$FILEPATH" ] || [ "$IP_ADDR" != "$(cat "$FILEPA
   echo "IP changed"
   echo $IP_ADDR > "$FILEPATH"
   cd "$APP_DIR"
-  python sendmail.py --subject "IP change" --body "$IP_ADDR"
+  python src/mail/sendmail.py --subject "IP change" --body "$IP_ADDR"
 fi
