@@ -129,14 +129,14 @@ On the Amazon AWS SES page, go to SMTP settings and make note of the
 **server name** and **port** choices; these will be needed later (see the
 screenshot below).
 
-<img src="doc/img/aws_ses_smtp.png">
+<img src="resources/images/aws_ses_smtp.png">
 
 Click *Create My SMTP Credentials* and follow the instructions therein. At the
 end of the process, you'll be presented with an SMTP username and password;
 these credentials will be required to communicate with the AWS mail server
 (refer to the screenshot below).
 
-<img src="doc/img/aws_ses.png">
+<img src="resources/images/aws_ses.png">
 
 Following this step, go to the Email Addresses link under Identity Management
 in the navigation bar (refer to the first screenshot above), click
