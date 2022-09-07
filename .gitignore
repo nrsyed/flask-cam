@@ -1,3 +1,6 @@
+# IDE config files
+.idea
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -10,6 +13,7 @@ __pycache__/
 *.swp
 
 # Distribution / packaging
+__init__.py
 .Python
 build/
 develop-eggs/
