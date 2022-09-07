@@ -65,10 +65,10 @@ if [[ "$SELECTION" == "y" ]]; then
   printf "Password: "
   read -s PASSWORD
   echo
-  python password.py --add-user --user "$USERNAME" --password "$PASSWORD" -f "$APP_DIR/users"
+  python src/auth/auth_manager.py --add-user --user "$USERNAME" --password "$PASSWORD" -f "$APP_DIR/resources/users"
   if [[ ! $? == 0 ]] ; then
     echo "Error adding user"
   else
-    echo "User $USERNAME added to $APP_DIR/users"
+    echo "User $USERNAME added to $APP_DIR/resources/users"
   fi
 fi
