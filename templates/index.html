@@ -7,6 +7,15 @@
     <img src="{{ url_for('stream') }}">
     <br>
     <h2>Controls</h2>
+    <form id="screen-resolution">
+      <div class="screen-resolution-div">
+        <span class="screen-label">Screen resolution</span>
+        <input class="set-fps" type="number" min=15 max=60 step=1 value=24>
+        <input class="set-width" type="number" min=640 max=1280 step=1 value=640>
+        <input class="set-height" type="number" min=480 max=1024 step=1 value=480>
+      </div>
+      <input id="launch" type="submit" value="Launch stream">
+    </form>
     <form id="controls">
       <div class="grid-container">
         <span class="header-row">Control</span>

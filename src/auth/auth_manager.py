@@ -1,12 +1,12 @@
-import argparse
-import base64
-import os
-import sys
+from os import path
+from typing import AnyStr
 
-import bcrypt
+from argparse import ArgumentParser
+from base64 import b64encode, b64decode
+from bcrypt import hashpw, gensalt
 
 
-def get_base64_hash(password):
+def get_base64_hash(password: AnyStr) -> AnyStr:
     """
     Return a string corresponding to a salted, bcrypt-hashed base-64
     representation of a password.
@@ -17,12 +17,12 @@ def get_base64_hash(password):
     :rtype: str
     """
 
-    hashed = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
-    hashed64 = base64.b64encode(hashed).decode("utf-8")
+    hashed = hashpw(password.encode("utf-8"), gensalt())
+    hashed64 = b64encode(hashed).decode("utf-8")
     return hashed64
 
 
-def add_user(user, password, filepath):
+def add_user(user: AnyStr, password: AnyStr, filepath: AnyStr) -> bool:
     """
     Add an authenticated user.
 
@@ -41,7 +41,7 @@ def add_user(user, password, filepath):
     """
 
     user_in_file = False
-    if os.path.isfile(filepath):
+    if path.isfile(filepath):
         with open(filepath, "r") as file_:
             for line in file_:
                 user_, hash_ = line.split("\t")
@@ -56,7 +56,7 @@ def add_user(user, password, filepath):
     return False
 
 
-def authenticate_password(password, hashed):
+def authenticate_password(password: AnyStr, hashed: bytes):
     """
     Determine whether a password corresponds to a hashed password.
 
@@ -67,10 +67,10 @@ def authenticate_password(password, hashed):
     :return: Whether the given password matches the hashed password.
     :rtype: bool
     """
-    return bcrypt.hashpw(password.encode("utf-8"), hashed) == hashed
+    return hashpw(password.encode("utf-8"), hashed) == hashed
 
 
-def authenticate_user(user, password, filepath):
+def authenticate_user(user: AnyStr, password: AnyStr, filepath: AnyStr) -> bool:
     """
     Authenticate a user and password.
 
@@ -85,17 +85,17 @@ def authenticate_user(user, password, filepath):
     :rtype: bool
     """
 
-    if os.path.isfile(filepath):
+    if path.isfile(filepath):
         with open(filepath, "r") as file_:
             for line in file_:
                 user_, hashed64 = line.strip().split("\t")
-                hashed = base64.b64decode(hashed64.encode("utf-8"))
+                hashed = b64decode(hashed64.encode("utf-8"))
                 if user == user_ and authenticate_password(password, hashed):
                     return True
     return False
 
 
-def delete_user(user, filepath):
+def delete_user(user: AnyStr, filepath: AnyStr) -> bool:
     """
     Remove a user from the list of authenticated users.
 
@@ -108,7 +108,7 @@ def delete_user(user, filepath):
     """
 
     user_removed = False
-    if os.path.isfile(filepath):
+    if path.isfile(filepath):
         with open(filepath, "r") as file_:
             lines = file_.readlines()
 
@@ -123,7 +123,7 @@ def delete_user(user, filepath):
     return user_removed
 
 
-def modify_user(user, password, filepath):
+def modify_user(user: AnyStr, password: AnyStr, filepath: AnyStr) -> bool:
     """
     Update the password for an existing user.
 
@@ -138,7 +138,7 @@ def modify_user(user, password, filepath):
     """
 
     user_modified = False
-    if os.path.isfile(filepath):
+    if path.isfile(filepath):
         with open(filepath, "r") as file_:
             lines = file_.readlines()
 
@@ -155,19 +155,19 @@ def modify_user(user, password, filepath):
 
 
 if __name__ == "__main__":
-    argparser = argparse.ArgumentParser()
+    argument_parser = ArgumentParser()
 
-    action_group = argparser.add_mutually_exclusive_group()
+    action_group = argument_parser.add_mutually_exclusive_group()
     action_group.add_argument("-a", "--add-user", action="store_true")
     action_group.add_argument("-d", "--delete-user", action="store_true")
     action_group.add_argument("-m", "--modify-user", action="store_true")
     action_group.add_argument("-c", "--check-password", action="store_true")
 
-    argparser.add_argument("-f", "--filepath", type=str, default="users")
-    argparser.add_argument("-u", "--user", required=True, type=str)
-    argparser.add_argument("-p", "--password", type=str)
+    argument_parser.add_argument("-f", "--filepath", type=str, default="users")
+    argument_parser.add_argument("-u", "--user", required=True, type=str)
+    argument_parser.add_argument("-p", "--password", type=str)
 
-    args = vars(argparser.parse_args())
+    args = vars(argument_parser.parse_args())
 
     if args["add_user"]:
         add_user(args["user"], args["password"], args["filepath"])

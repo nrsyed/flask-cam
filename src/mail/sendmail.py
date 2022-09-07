@@ -1,12 +1,15 @@
-import argparse
-import email.utils
+from argparse import ArgumentParser
+from json import load as js_load
+from typing import AnyStr, Any, NoReturn
+from smtplib import SMTP
+from syslog import syslog
+
+from email.utils import formataddr
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-import json
-import smtplib
-import syslog
 
-def import_secrets(filename):
+
+def import_secrets(filename: AnyStr) -> Any:
     """
     Import a secrets file containing JSON in the following form:
 
@@ -22,23 +25,30 @@ def import_secrets(filename):
     """
 
     with open(filename, "r") as file_:
-        secrets = json.load(file_)
+        secrets = js_load(file_)
     return secrets
 
+
 def send_mail(
-    sender, sender_name, recipient, smtp_username, smtp_password, host, port,
-    subject, body, verbose=False
-):
+        sender: AnyStr,
+        sender_name: AnyStr,
+        recipient: AnyStr,
+        smtp_username: AnyStr,
+        smtp_password: AnyStr,
+        host: AnyStr,
+        port: int,
+        subject: AnyStr,
+        body: AnyStr,
+        verbose=False
+) -> NoReturn:
     msg = MIMEMultipart("alternative")
     msg["Subject"] = subject
-    msg["From"] = email.utils.formataddr(
-        (sender_name, sender)
-    )
+    msg["From"] = formataddr( (sender_name, sender) )
     msg["To"] = recipient
     msg.attach(MIMEText(body, "plain"))
 
     try:
-        server = smtplib.SMTP(host, port)
+        server = SMTP(host, port)
         server.ehlo()
         server.starttls()
         server.ehlo()
@@ -46,30 +56,29 @@ def send_mail(
         server.sendmail(sender, recipient, msg.as_string())
         server.close()
     except Exception as e:
-        syslog.syslog(str(e))
+        syslog(str(e))
         if verbose:
             print(e)
     else:
         msg = "Email sent to {}".format(recipient)
-        syslog.syslog(msg)
+        syslog(msg)
         if verbose:
             print(msg)
 
+
 if __name__ == "__main__":
-    argparser = argparse.ArgumentParser()
-    argparser.add_argument("-b", "--body", type=str, default="")
-    argparser.add_argument(
-        "-f", "--filepath", default="secrets", help="Path to secrets file"
-    )
-    argparser.add_argument("-s", "--subject", type=str, default="")
-    argparser.add_argument("-v", "--verbose", action="store_true")
-    args = argparser.parse_args()
+    argument_parser = ArgumentParser()
+
+    argument_parser.add_argument("-b", "--body", type=str, default="")
+    argument_parser.add_argument("-f", "--filepath", default="secrets", help="Path to secrets file")
+    argument_parser.add_argument("-s", "--subject", type=str, default="")
+    argument_parser.add_argument("-v", "--verbose", action="store_true")
+
+    args = argument_parser.parse_args()
+
     body = args.body
     subject = args.subject
     verbose = args.verbose
 
     secrets = import_secrets(args.filepath)
     send_mail(body=body, subject=subject, verbose=verbose, **secrets)
-
-
-

@@ -1,11 +1,11 @@
 from datetime import datetime
-import subprocess
+from typing import AnyStr, NoReturn, Any
+from subprocess import call as subproc_call, check_output
 
 import cv2
-import numpy as np
 
 
-class Camera():
+class Camera(object):
     """
     Class for reading frames from or getting/setting control values for a camera.
     """
@@ -22,8 +22,13 @@ class Camera():
         :type control_names: dict
         """
 
-        self.cap = cv2.VideoCapture(src)
+        self.camera_fps = 24
+        self.screen_width = 640
+        self.screen_height = 480
+
         self.device_name = device_name
+
+        self.video_capture = cv2.VideoCapture(src)
 
         if control_names is None:
             control_names = dict()
@@ -48,6 +53,8 @@ class Camera():
             "zoom": zoom
         }
 
+    def __del__(self):
+        self.video_capture.release()
 
     def get_frame(self):
         """
@@ -55,16 +62,12 @@ class Camera():
         timestamp on the frame, and return it encoded as a JPG.
         """
 
-        grabbed, frame = self.cap.read()
+        grabbed, frame = self.video_capture.read()
 
         if not grabbed:
-            self.cap.release()
+            self.video_capture.release()
 
-        # Resize frame to a desired size; since frames are not compressed
-        # before passing them to the web frontend, large frame sizes may reduce
-        # speed/performance.
-        # TODO: add desired frame size as a parameter?
-        frame = cv2.resize(frame, (640, 480))
+        frame = cv2.resize(frame, (self.screen_width, self.screen_height))
         height, width = frame.shape[:2]
         timestamp = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
         cv2.putText(
@@ -74,8 +77,10 @@ class Camera():
         frame_jpg = cv2.imencode(".jpg", frame)[1]
         return frame_jpg
 
+    def set_fps(self, fps: int = 24) -> NoReturn:
+        self.video_capture.set(cv2.CAP_PROP_FPS, fps)
 
-    def set_control_value(self, control, value):
+    def set_control_value(self, control: AnyStr, value: Any) -> NoReturn:
         """
         Call uvcdynctrl in a subprocess to set a control value.
 
@@ -87,15 +92,14 @@ class Camera():
 
         # Full path to uvcdynctrl needed.
         control_name = self.control_names[control]
-        subprocess.call(
+        subproc_call(
             [
                 "/usr/bin/uvcdynctrl", "-d", self.device_name, "-s",
                 control_name, str(value)
             ]
         )
 
-
-    def get_control_value(self, control):
+    def get_control_value(self, control: AnyStr) -> bool or int:
         """
         Call uvcdynctrl in a subprocess to get the current value of a control.
 
@@ -108,7 +112,7 @@ class Camera():
         """
 
         control_name = self.control_names[control]
-        value = subprocess.check_output(
+        value = check_output(
             ["/usr/bin/uvcdynctrl", "-d", self.device_name, "-g", control_name]
         )
         value = int(value.decode("utf-8").strip())
@@ -121,7 +125,3 @@ class Camera():
             # Options are 1 (manual mode) and 3 (aperture priority mode).
             return value == 3
         return value
-
-
-    def __del__(self):
-        self.cap.release()

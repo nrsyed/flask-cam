@@ -1,12 +1,20 @@
-import functools
-from ipaddress import ip_address, ip_network
-import os
-import subprocess
-import sys
-import syslog
-import time
+from os import path
+from sys import path
+from syslog import syslog
+from functools import wraps
+from time import sleep as time_sleep
 
-from flask import Flask, jsonify, render_template, Response, request, current_app
+from ipaddress import ip_address, ip_network
+
+from werkzeug import exceptions
+from flask import (
+    Flask,
+    Response,
+    current_app,
+    jsonify,
+    request,
+    render_template
+)
 
 from camera import Camera
 from password import authenticate_user
@@ -15,6 +23,8 @@ from password import authenticate_user
 app = Flask(__name__)
 cam = Camera()
 
+CONTENT_DATA = '--frame-boundary\r\nContent-Type: image/jpeg\r\n\r\n%s\r\n'
+
 
 @app.before_first_request
 def initialize():
@@ -22,9 +32,7 @@ def initialize():
 
 
 def unauthorized():
-    return Response(
-        "Credential error", 401, {"WWW-Authenticate": "Basic realm='Login Required'"}
-    )
+    return Response("Credential error", 401, {"WWW-Authenticate": "Basic realm='Login Required'"})
 
 
 def requires_auth(func):
@@ -32,7 +40,7 @@ def requires_auth(func):
     Decorator for routes that require authentication.
     """
 
-    @functools.wraps(func)
+    @wraps(func)
     def wrapper(*args, **kwargs):
         # Running a script from Python with subprocess via gunicorn seems to
         # present many issues, including lack of PATH and inability to resolve
@@ -43,18 +51,19 @@ def requires_auth(func):
         # `XXX.XXX.XXX.XXX/YYY.YYY.YYY.YYY`.
 
         subnet = None
-        filepath = os.path.join(sys.path[0], "tmp/local_network")
+        # filepath = path.join(path[0], "tmp/local_network")
+        filepath = "/tmp/local_network"
         try:
             with open(filepath, "r") as file_:
                 local_ip_and_mask = file_.readline().strip()
             subnet = ip_network(local_ip_and_mask, strict=False)
         except Exception as e:
-            syslog.syslog(str(e))
+            syslog(str(e))
 
         # Get IP address of requester using nginx header. Do not require
         # authentication for requests originating on the local network.
         remote_addr = request.environ.get("HTTP_X_FORWARDED_FOR")
-        syslog.syslog("request from {}".format(remote_addr))
+        syslog("request from {}".format(remote_addr))
         if remote_addr is None or subnet is None or ip_address(remote_addr) not in subnet:
             auth = request.authorization
             if not auth or not authenticate_user(auth.username, auth.password, "users"):
@@ -64,21 +73,20 @@ def requires_auth(func):
 
 
 @app.route("/")
-@requires_auth
+# @requires_auth
 def index():
     return render_template("index.html")
 
 
 @app.route("/kiosk")
-@requires_auth
+# @requires_auth
 def kiosk():
     return render_template("kiosk.html")
 
 
-@app.route("/stream")
-def stream():
-    mimetype = "multipart/x-mixed-replace; boundary=frame-boundary"
-    return Response(gen(), mimetype=mimetype)
+@app.errorhandler(exceptions.BadRequest)
+def handle_bad_request(e):
+    return f'bad request: {e}', 400
 
 
 @app.route("/get", methods=["GET"])
@@ -129,6 +137,18 @@ def submit():
     return "ok"
 
 
+@app.route("/stream", methods=["GET", "POST"])
+def stream():
+    mimetype = "multipart/x-mixed-replace; boundary=frame-boundary"
+
+    if request.method == "POST":
+        cam.set_fps(int(request.form["fps"]))
+        cam.screen_width = int(request.form["width"])
+        cam.screen_height = int(request.form["height"])
+
+    return Response(gen(), mimetype=mimetype)
+
+
 def gen():
     """
     Generator to continuously grab and yield frames from the Camera object.
@@ -136,13 +156,11 @@ def gen():
 
     while True:
         frame = cam.get_frame()
-        yield (b'--frame-boundary\r\nContent-Type: image/jpeg\r\n\r\n'
-                + bytearray(frame) + b'\r\n'
-        )
+        yield (b'--frame-boundary\r\nContent-Type: image/jpeg\r\n\r\n' + bytearray(frame) + b'\r\n')
         with app.app_context():
             # Add nominal delay between frames to prevent performance issues.
-            time.sleep(current_app.delay)
+            time_sleep(current_app.delay)
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0")
+    app.run(host="0.0.0.0", port=5001)
