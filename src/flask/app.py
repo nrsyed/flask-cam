@@ -1,5 +1,5 @@
-from flaskcam import app
+from src.flask.routes.routes import flask_application
 
 
 if __name__ == "__main__":
-    app.run()
+    flask_application.run()
