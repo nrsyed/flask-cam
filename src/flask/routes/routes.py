@@ -1,5 +1,3 @@
-from os import path
-from sys import path
 from syslog import syslog
 from functools import wraps
 from time import sleep as time_sleep
@@ -16,17 +14,15 @@ from flask import (
     render_template
 )
 
-from camera import Camera
-from password import authenticate_user
+from src.flask.camera.camera import Camera
+from src.auth.auth_manager import authenticate_user
 
 
-app = Flask(__name__)
-cam = Camera()
-
-CONTENT_DATA = '--frame-boundary\r\nContent-Type: image/jpeg\r\n\r\n%s\r\n'
+flask_application = Flask(__name__)
+camera = Camera()
 
 
-@app.before_first_request
+@flask_application.before_first_request
 def initialize():
     current_app.delay = 0.1
 
@@ -72,24 +68,24 @@ def requires_auth(func):
     return wrapper 
 
 
-@app.route("/")
-# @requires_auth
+@flask_application.route("/")
+@requires_auth
 def index():
     return render_template("index.html")
 
 
-@app.route("/kiosk")
-# @requires_auth
+@flask_application.route("/kiosk")
+@requires_auth
 def kiosk():
     return render_template("kiosk.html")
 
 
-@app.errorhandler(exceptions.BadRequest)
+@flask_application.errorhandler(exceptions.BadRequest)
 def handle_bad_request(e):
     return f'bad request: {e}', 400
 
 
-@app.route("/get", methods=["GET"])
+@flask_application.route("/get", methods=["GET"])
 def get():
     controls = [
         "autoexposure",
@@ -104,12 +100,12 @@ def get():
 
     control_values = dict()
     for control in controls:
-        control_values[control] = cam.get_control_value(control)
+        control_values[control] = camera.get_control_value(control)
     control_values["delay"] = current_app.delay
     return jsonify(control_values)
 
 
-@app.route("/submit", methods=["POST"])
+@flask_application.route("/submit", methods=["POST"])
 def submit():
     """
     Route called when submitting the control form from the web interface
@@ -125,26 +121,26 @@ def submit():
     zoom = int(request.form["zoom"])
     current_app.delay = float(request.form["delay"])
 
-    cam.set_control_value("autoexposure", {"true": 3, "false": 1}[autoexposure])
-    cam.set_control_value("autofocus", {"true": 1, "false": 0}[autofocus])
-    cam.set_control_value("brightness", brightness)
-    cam.set_control_value("contrast", contrast)
-    cam.set_control_value("exposure", exposure)
-    cam.set_control_value("focus", focus)
-    cam.set_control_value("zoom", zoom)
+    camera.set_control_value("autoexposure", {"true": 3, "false": 1}[autoexposure])
+    camera.set_control_value("autofocus", {"true": 1, "false": 0}[autofocus])
+    camera.set_control_value("brightness", brightness)
+    camera.set_control_value("contrast", contrast)
+    camera.set_control_value("exposure", exposure)
+    camera.set_control_value("focus", focus)
+    camera.set_control_value("zoom", zoom)
 
     # TODO: response
     return "ok"
 
 
-@app.route("/stream", methods=["GET", "POST"])
+@flask_application.route("/stream", methods=["GET", "POST"])
 def stream():
     mimetype = "multipart/x-mixed-replace; boundary=frame-boundary"
 
     if request.method == "POST":
-        cam.set_fps(int(request.form["fps"]))
-        cam.screen_width = int(request.form["width"])
-        cam.screen_height = int(request.form["height"])
+        camera.set_fps(int(request.form["fps"]))
+        camera.screen_width = int(request.form["width"])
+        camera.screen_height = int(request.form["height"])
 
     return Response(gen(), mimetype=mimetype)
 
@@ -155,12 +151,8 @@ def gen():
     """
 
     while True:
-        frame = cam.get_frame()
+        frame = camera.get_frame()
         yield (b'--frame-boundary\r\nContent-Type: image/jpeg\r\n\r\n' + bytearray(frame) + b'\r\n')
-        with app.app_context():
+        with flask_application.app_context():
             # Add nominal delay between frames to prevent performance issues.
             time_sleep(current_app.delay)
-
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001)
