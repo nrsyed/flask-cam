@@ -16,6 +16,7 @@
       </div>
       <input id="launch" type="submit" value="Launch stream">
     </form>
+    <br>
     <form id="controls">
       <div class="grid-container">
         <span class="header-row">Control</span>
@@ -23,15 +24,21 @@
         <span class="header-row">Set</span>
         <span class="header-row">Current value</span>
 
+        <br>
+
         <span class="label">Brightness</span>
         <span class="range">0–255</span>
         <input class="set brightness" type="number" min=0 max=255 step=1 value=0>
         <span class="current-value brightness">0</span>
 
+        <br>
+
         <span class="label">Contrast</span>
         <span class="range">0–255</span>
         <input class="set contrast" type="number" min=0 max=255 step=1 value=0>
         <span class="current-value contrast">0</span>
+
+        <br>
 
         <span class="label">Auto-exposure</span>
         <span class="range">on/off</span>
@@ -41,10 +48,14 @@
           onclick="return false;"
         >
 
+        <br>
+
         <span class="label">Exposure</span>
         <span class="range">3–2047</span>
         <input class="set exposure" type="number" min=3 max=2047 step=1 value=250>
         <span class="current-value exposure">0</span>
+
+        <br>
 
         <span class="label">Autofocus</span>
         <span class="range">on/off</span>
@@ -54,20 +65,28 @@
           onclick="return false;"
         >
 
+        <br>
+
         <span class="label">Focus</span>
         <span class="range">0–250</span>
         <input class="set focus" type="number" min=0 max=250 step=5 value=0>
         <span class="current-value focus">0</span>
+
+        <br>
 
         <span class="label">Saturation</span>
         <span class="range">0–255</span>
         <input class="set saturation" type="number" min=0 max=255 step=1 value=0>
         <span class="current-value saturation">0</span>
 
+        <br>
+
         <span class="label">Zoom</span>
         <span class="range">100–500</span>
         <input class="set zoom" type="number" min=100 max=500 step=1 value=100>
         <span class="current-value zoom">100</span>
+
+        <br>
 
         <span class="label">Delay (s)</span>
         <span class="range">&ge; 0</span>
